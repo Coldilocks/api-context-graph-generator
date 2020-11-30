@@ -1,4 +1,9 @@
-package codeAnalysis.process;/**
+package codeAnalysis.process;
+
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+
+/**
  * @author coldilock
-*/public class GraphConverter {
+ */
+public class GraphConverter extends VoidVisitorAdapter<Object> {
 }

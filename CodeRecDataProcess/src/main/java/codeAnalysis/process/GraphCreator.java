@@ -1,4 +1,7 @@
-package codeAnalysis.process;/**
+package codeAnalysis.process;
+
+/**
  * @author coldilock
-*/public class GraphCreator {
+ */
+public class GraphCreator {
 }

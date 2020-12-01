@@ -1,4 +1,11 @@
-package codeanalysis.constructor;/**
+package codeanalysis.constructor;
+
+/**
  * @author coldilock
-*/public class GraphConstructor {
+ */
+public class GraphConstructor {
+
+    public void createGraph(String filePath){
+
+    }
 }

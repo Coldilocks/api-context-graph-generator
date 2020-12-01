@@ -1,4 +1,10 @@
-package codeanalysis.representation;/**
+package codeanalysis.representation.node;
+
+import codeanalysis.representation.GraphNode;
+
+/**
  * @author coldilock
-*/public class APIFieldAceessNode {
+ * API field access node
+ */
+public class FieldAccessNode extends GraphNode {
 }

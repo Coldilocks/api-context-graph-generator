@@ -1,4 +1,10 @@
-package codeanalysis.representation;/**
+package codeanalysis.representation.node;
+
+import codeanalysis.representation.GraphNode;
+
+/**
  * @author coldilock
-*/public class VarDeclarationNode {
+ * Variable declaration node
+ */
+public class VarDeclarationNode extends GraphNode {
 }

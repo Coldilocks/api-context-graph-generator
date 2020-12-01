@@ -1,4 +1,10 @@
-package codeanalysis.representation;/**
+package codeanalysis.representation.node;
+
+import codeanalysis.representation.GraphNode;
+
+/**
  * @author coldilock
-*/public class APIMethodCallNode {
+ * API method call node
+ */
+public class MethodCallNode extends GraphNode {
 }

@@ -15,6 +15,8 @@ public class GraphNode implements Cloneable, Serializable {
     private List<GraphNode> linkedNode;
     /** record the original statement of current node */
     private String originalStatement;
+    /** name of the node */
+    private String nodeName;
 
     public GraphNode getParentNode() {
         return parentNode;
@@ -46,5 +48,20 @@ public class GraphNode implements Cloneable, Serializable {
 
     public void setOriginalStatement(String originalStatement) {
         this.originalStatement = originalStatement;
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
+    }
+
+    @Override
+    public String toString() {
+        return "GraphNode{" +
+                "nodeName='" + nodeName + '\'' +
+                '}';
     }
 }

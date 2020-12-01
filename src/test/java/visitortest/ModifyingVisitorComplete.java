@@ -1,3 +1,5 @@
+package visitortest;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -11,7 +13,7 @@ import java.util.regex.Pattern;
  * @author coldilock
  * 修改原始代码中字段初始化表达式的赋值
  */
-public class ModifyingVisitorStarter {
+public class ModifyingVisitorComplete {
     private static final String FILE_PATH = "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/test/resources/ReversePolishNotation.java";
     public static void main(String[] args) throws Exception {
         CompilationUnit cu = StaticJavaParser.parse(new File(FILE_PATH));

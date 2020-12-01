@@ -1,14 +1,21 @@
 package test;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+//import org.apache.commons.lang.ArrayUtils;
+//import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+import java.lang.*;
 
 /**
  * @author coldilock
  */
 public class Method {
+
+    private String filePath = "";
 
     public static String getContent(String fileName) {
         File file = new File(fileName);
@@ -32,6 +39,8 @@ public class Method {
         }
         return sb.toString();
     }
+
+    private String filePath2 = "";
 
 //    public String test1(String []strs, String connector){
 //        if(strs == null || strs.length == 0){

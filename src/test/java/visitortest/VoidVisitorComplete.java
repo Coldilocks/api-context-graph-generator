@@ -1,3 +1,5 @@
+package visitortest;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -41,7 +43,8 @@ public class VoidVisitorComplete {
     /** A Simple Visitor With State */
     private static class MethodNameCollector extends VoidVisitorAdapter<List<String>> {
 
-        @Override public void visit(MethodDeclaration md, List<String> collector) {
+        @Override
+        public void visit(MethodDeclaration md, List<String> collector) {
 
             super.visit(md, collector);
 

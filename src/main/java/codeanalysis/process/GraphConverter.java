@@ -1,4 +1,4 @@
-package codeAnalysis.process;
+package codeanalysis.process;
 
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 

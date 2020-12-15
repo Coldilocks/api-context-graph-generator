@@ -1,15 +1,17 @@
 import codeanalysis.constructor.GraphConstructor;
+import codeanalysis.representation.Graph;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import org.checkerframework.checker.units.qual.K;
 import util.DataConfig;
-import visitors.ImportVisitor;
+import visitors.*;
+import visitors2.MethodStmtVisitor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,27 +25,21 @@ import java.util.Map;
  */
 public class Test {
 
+    private static String filePath = "src/test/resources/testcase/Method1-8.java";
 
-//    public static void main(String[] args) {
-//        if(args.length == 0){
-//            System.out.println("please specify the path of the config file");
-//            System.exit(0);
-//        } else if(!new File(args[0]).exists()){
-//            System.out.printf("%s doesn't exist", args[0]);
-//            System.exit(0);
-//        } else {
-//            DataConfig.loadConfig(args[0]);
-//        }
-//
-//        String filePath = DataConfig.TEST_INPUT_JAVA_FILE;
-//
-//        GraphConstructor graphConstructor = new GraphConstructor();
-//        graphConstructor.createGraph(filePath);
-//
-//    }
 
     public static void main(String[] args) throws FileNotFoundException {
-        String filePath = "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/test/resources/Method.java";
+        // get import list with or without asterisk
+         testForImport();
+    }
+
+
+    /**
+     * get import list with or without asterisk
+     * @throws FileNotFoundException
+     */
+    public static void testForImport() throws FileNotFoundException {
+
         CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
 
         Map<String, List<String>> importNames = new HashMap<>();
@@ -54,12 +50,5 @@ public class Test {
             System.out.printf("%s : %s\n", entry.getKey(), entry.getValue());
         }
 
-
     }
-
-
-
-
-
-
 }

@@ -1,0 +1,7 @@
+digraph {
+n0 [label="root (PackageDeclaration)"];
+n1 [label="name (Name)"];
+n0 -> n1;
+n2 [label="identifier='test'"];
+n1 -> n2;
+}

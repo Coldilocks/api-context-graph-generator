@@ -8,6 +8,6 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 /**
  * @author coldilock
  */
-public abstract class GraphConverter extends VoidVisitorAdapter<Object> {
+public abstract class BaeGraphConverter extends VoidVisitorAdapter<Object> {
 
 }

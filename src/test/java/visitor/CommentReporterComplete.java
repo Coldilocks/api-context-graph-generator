@@ -1,8 +1,7 @@
-package visitortest;
+package visitor;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.comments.Comment;
 
 import java.io.File;
 import java.io.FileNotFoundException;

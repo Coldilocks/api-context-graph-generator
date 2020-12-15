@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * @author coldilock
  */
-public class MethodVisitor extends VoidVisitorAdapter<List<String>> {
+public class MethodVisitorBackup extends VoidVisitorAdapter<List<String>> {
 
     private Map<String, String> parameters = new HashMap<>();
 
@@ -34,27 +34,14 @@ public class MethodVisitor extends VoidVisitorAdapter<List<String>> {
 
     @Override
     public void visit(MethodDeclaration md, List<String> node) {
-        /*
-         * run before visit(VariableDeclarationExpr) and visit(AssignExpr)
-         */
 
-//        System.out.println("【method");
-        NodeList<Statement> statements =  md.getBody().get().getStatements();
-        for(Statement stm : statements){
-            System.out.println("statement:");
-            System.out.println(stm + "\n");
-        }
-
+        md.getBody().ifPresent(body -> {
+            for(Statement stm : body.getStatements()){
+//                System.out.println("statement:");
+//                System.out.println(stm + "\n");
+            }
+        });
         super.visit(md, node);
-
-        /*
-         * run after visit(VariableDeclarationExpr) and visit(AssignExpr)
-         */
-
-//        System.out.println("method】");
-
-        node.add("method declaration");
-//        System.out.println("method closed");
     }
 
     @Override

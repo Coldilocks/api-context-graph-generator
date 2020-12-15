@@ -24,21 +24,11 @@ import java.util.Map;
  * @author coldilock
  */
 public class Test {
-
-    private static String filePath = "src/test/resources/testcase/Method1-8.java";
-
-
-    public static void main(String[] args) throws FileNotFoundException {
-        // get import list with or without asterisk
-         testForImport();
-    }
-
-
     /**
      * get import list with or without asterisk
      * @throws FileNotFoundException
      */
-    public static void testForImport() throws FileNotFoundException {
+    public static void testForImport(String filePath) throws FileNotFoundException {
 
         CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
 

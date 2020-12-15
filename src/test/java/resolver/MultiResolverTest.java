@@ -17,7 +17,7 @@ import java.io.IOException;
 /**
  * @author coldilock
  */
-public class ResolveMethodCalls {
+public class MultiResolverTest {
 
     private static final String filePath4JdkMethod = "src/test/resources/testcase/Task1.java";
 

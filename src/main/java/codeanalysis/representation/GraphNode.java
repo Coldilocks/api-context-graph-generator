@@ -1,6 +1,9 @@
 package codeanalysis.representation;
 
+import com.github.javaparser.ast.stmt.Statement;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,11 +15,18 @@ public class GraphNode implements Cloneable, Serializable {
     /** child nodes */
     private List<GraphNode> childNodes;
     /** linked parent nodes from data flow */
-    private List<GraphNode> linkedNode;
+    private List<GraphNode> linkedNodes;
     /** record the original statement of current node */
     private String originalStatement;
     /** name of the node */
     private String nodeName;
+    /** javaparser statement node */
+    private Statement japaStatement;
+
+    public GraphNode(){
+        this.childNodes = new ArrayList<>();
+        this.linkedNodes = new ArrayList<>();
+    }
 
     public GraphNode getParentNode() {
         return parentNode;
@@ -34,12 +44,12 @@ public class GraphNode implements Cloneable, Serializable {
         this.childNodes = childNodes;
     }
 
-    public List<GraphNode> getLinkedNode() {
-        return linkedNode;
+    public List<GraphNode> getLinkedNodes() {
+        return linkedNodes;
     }
 
-    public void setLinkedNode(List<GraphNode> linkedNode) {
-        this.linkedNode = linkedNode;
+    public void setLinkedNodes(List<GraphNode> linkedNodes) {
+        this.linkedNodes = linkedNodes;
     }
 
     public String getOriginalStatement() {
@@ -56,6 +66,18 @@ public class GraphNode implements Cloneable, Serializable {
 
     public void setNodeName(String nodeName) {
         this.nodeName = nodeName;
+    }
+
+    public Statement getJapaStatement() {
+        return japaStatement;
+    }
+
+    public void setJapaStatement(Statement japaStatement) {
+        this.japaStatement = japaStatement;
+    }
+
+    public void addChildNode(GraphNode graphNode){
+        this.childNodes.add(graphNode);
     }
 
     @Override

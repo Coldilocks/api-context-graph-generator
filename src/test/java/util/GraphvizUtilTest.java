@@ -1,35 +1,20 @@
-package utils;
+package util;
 
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.printer.DotPrinter;
-
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+
+import org.junit.Test;
 
 /**
+ * Unit test for {@link GraphvizUtil}
  * @author coldilock
  */
 public class GraphvizUtilTest {
 
-    public static void createDotFile(String inputPath, String outputPath) throws IOException {
-        CompilationUnit cu = StaticJavaParser.parse(new File(inputPath));
-
-        DotPrinter printer = new DotPrinter(true);
-        try (FileWriter fileWriter = new FileWriter(outputPath);
-             PrintWriter printWriter = new PrintWriter(fileWriter)) {
-//            printWriter.print(printer.output(cu));
-            printWriter.print(printer.output(cu.getChildNodes().get(6).getChildNodes().get(2)));
-
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        String inputJavaFilePath = "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/test/resources/Method.java";
-        String outputDotFilePath = "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/test/resources/ast3.dot";
-        createDotFile(inputJavaFilePath, outputDotFilePath);
+    @Test
+    public void createGraph() throws IOException {
+        String inputJavaFilePath = "src/test/resources/testcase/Task1.java";
+        String outputDotFilePath = "src/test/resources/dot/Task1.dot";
+        GraphvizUtil.createDotFile(inputJavaFilePath, outputDotFilePath);
     }
 
 }

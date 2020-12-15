@@ -1,3 +1,5 @@
+package visitor;
+
 import codeanalysis.constructor.GraphConstructor;
 import codeanalysis.representation.Graph;
 import com.github.javaparser.StaticJavaParser;
@@ -23,7 +25,7 @@ import java.util.Map;
 /**
  * @author coldilock
  */
-public class Test {
+public class MultiVisitorTest {
 
     private static String filePath = "src/test/resources/testcase/Method1-8.java";
 

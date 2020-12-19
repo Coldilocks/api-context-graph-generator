@@ -1,4 +1,4 @@
-package visitor;
+package visitor.tutorial;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;

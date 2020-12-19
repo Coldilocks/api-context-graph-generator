@@ -1,4 +1,4 @@
-package visitor;
+package visitor.tutorial;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * @author coldilock
  */
-public class CommentReporterComplete {
+public class CommentReporter {
 
     private static final String FILE_PATH = "src/main/java/org/javaparser/samples/ReversePolishNotation.java";
 

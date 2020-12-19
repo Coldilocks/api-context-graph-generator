@@ -37,7 +37,7 @@ public class MethodStmtVisitor extends VoidVisitorAdapter<Graph> {
 
     @Override
     public void visit(DoStmt n, Graph graph) {
-        System.out.println("DO WHILE");
+        System.out.println("[DO WHILE] " + n.toString());
         super.visit(n, graph);
     }
 
@@ -53,7 +53,7 @@ public class MethodStmtVisitor extends VoidVisitorAdapter<Graph> {
 
     @Override
     public void visit(ExpressionStmt n, Graph graph) {
-        System.out.println("EXPRESSION");
+        System.out.println("[EXPRESSION] " + n.toString());
         Expression expression = n.getExpression();
         if(expression != null){
             if(expression.isVariableDeclarationExpr()){
@@ -87,19 +87,19 @@ public class MethodStmtVisitor extends VoidVisitorAdapter<Graph> {
 
     @Override
     public void visit(ForEachStmt n, Graph graph) {
-        System.out.println("FOR EACH");
+        System.out.println("[FOR EACH] " + n.toString());
         super.visit(n, graph);
     }
 
     @Override
     public void visit(ForStmt n, Graph graph) {
-        System.out.println("FOR");
+        System.out.println("[FOR] " + n.toString());
         super.visit(n, graph);
     }
 
     @Override
     public void visit(IfStmt n, Graph graph) {
-        System.out.println("IF");
+        System.out.println("[IF] " + n.toString());
         super.visit(n, graph);
     }
 
@@ -110,7 +110,7 @@ public class MethodStmtVisitor extends VoidVisitorAdapter<Graph> {
 
     @Override
     public void visit(ReturnStmt n, Graph graph) {
-        System.out.println("RETURN");
+        System.out.println("[RETURN] " + n.toString());
         super.visit(n, graph);
     }
 
@@ -126,13 +126,13 @@ public class MethodStmtVisitor extends VoidVisitorAdapter<Graph> {
 
     @Override
     public void visit(ThrowStmt n, Graph graph) {
-        System.out.println("THROW");
+        System.out.println("[THROW] " + n.toString());
         super.visit(n, graph);
     }
 
     @Override
     public void visit(TryStmt n, Graph graph) {
-        System.out.println("TRY");
+        System.out.println("[TRY] " + n.toString());
         super.visit(n, graph);
     }
 
@@ -143,7 +143,7 @@ public class MethodStmtVisitor extends VoidVisitorAdapter<Graph> {
 
     @Override
     public void visit(WhileStmt n, Graph graph) {
-        System.out.println("WHILE");
+        System.out.println("[WHILE] " + n.toString());
         super.visit(n, graph);
     }
 

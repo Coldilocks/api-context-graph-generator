@@ -21,7 +21,6 @@ import java.util.Map;
 public class GraphVisitor extends VoidVisitorAdapter<Graph> {
     private Map<String, String> parameters = new HashMap<>();
 
-
     @Override
     public void visit(MethodDeclaration md, Graph graph) {
         md.getBody().ifPresent(body -> {

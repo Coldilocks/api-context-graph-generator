@@ -2,35 +2,43 @@ package visitor;
 
 import codeanalysis.constructor.GraphConstructor;
 import codeanalysis.representation.Graph;
+import com.github.javaparser.JavaToken;
+import com.github.javaparser.Range;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.visitor.TreeVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
+import com.github.javaparser.printer.lexicalpreservation.PhantomNodeLogic;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import util.DataConfig;
 import visitors.*;
+import visitors2.MethodCompleteVisitor;
 import visitors2.MethodStmtVisitor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author coldilock
  */
 public class MultiVisitorTest {
 
-    private static String filePath = "src/test/resources/testcase/Method1-8.java";
+    private static String filePath = "src/test/resources/testcase/Task1.java";
 
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
 
         // run(args);
 
@@ -47,7 +55,28 @@ public class MultiVisitorTest {
         // testForMethodStatement();
 
         // visit and resolve type for method call
-        jdkMethodVisitorAndSymbolSolver();
+        // jdkMethodVisitorAndSymbolSolver();
+
+        // using MethodCompleteVisitor
+         getJdkAndCustomType();
+
+        // pre order the tree
+        // preOrder();
+
+//        String test8 = "hello world", test9 = "hello world";
+//        String test10 = "hello world", test11;
+//        String test12, test13 = "hello world";
+//
+//        System.out.println(test8);
+//        System.out.println(test9);
+//        System.out.println(test10);
+//        System.out.println(test13);
+
+
+
+
+
+
 
     }
 
@@ -114,13 +143,9 @@ public class MultiVisitorTest {
                     MethodVisitor methodVisitor = new MethodVisitor();
                     method.accept(methodVisitor, graph);
 //                    System.out.println(graph);
-
                     System.out.println(">>>>>>>>>>");
                 })
         );
-
-
-
     }
 
     /**
@@ -162,7 +187,62 @@ public class MultiVisitorTest {
 
     }
 
+    public static void getJdkAndCustomType() throws IOException {
 
+        String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
+
+        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
+        typeSolver.add(new ReflectionTypeSolver());
+        typeSolver.add(JarTypeSolver.getJarTypeSolver(jarFile));
+
+        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
+        StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
+
+        CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
+
+        cu.getTypes().forEach(type ->
+                type.getMethods().forEach(method -> {
+                    System.out.println("<<<<<<<< START >>>>>>>>");
+                    Graph graph = new Graph();
+
+                    MethodCompleteVisitor visitor = new MethodCompleteVisitor();
+                    method.accept(visitor, graph);
+
+                    System.out.println("<<<<<<<< END >>>>>>>>");
+
+                }));
+
+
+
+    }
+
+
+    private static void preOrder() throws FileNotFoundException {
+
+        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
+        typeSolver.add(new ReflectionTypeSolver());
+
+        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
+        StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
+
+        CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
+
+        cu.getTypes().forEach(type ->
+                type.getMethods().forEach(method -> {
+                    System.out.println("<<<<<<<< START >>>>>>>>");
+                    new TreeVisitor() {
+                        @Override
+                        public void process(Node node) {
+//                            System.out.println("[[[["+node.toString()+"]]]]\n");
+                        }
+                    }.visitPreOrder(method);
+
+                    System.out.println("<<<<<<<< END >>>>>>>>");
+
+                }));
+
+
+    }
 
 
 

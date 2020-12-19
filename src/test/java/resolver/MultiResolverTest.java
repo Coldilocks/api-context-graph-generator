@@ -46,7 +46,7 @@ public class MultiResolverTest {
         );
 
         cu.findAll(VariableDeclarationExpr.class).forEach(
-                vde -> System.out.println(vde.calculateResolvedType())
+                vde -> System.out.println(vde.calculateResolvedType().describe())
         );
     }
 
@@ -129,7 +129,7 @@ public class MultiResolverTest {
          * Get qualified JDK method signature for method call,
          * and get qualified class name for variable declaration
          */
-         getQualifiedJdkMethodSignatureAndVarType(filePath4JdkMethod);
+        getQualifiedJdkMethodSignatureAndVarType(filePath4JdkMethod);
 
          System.out.println(System.lineSeparator());
 
@@ -137,7 +137,7 @@ public class MultiResolverTest {
          * Get qualified JDK method signature,return type & throws type for method call,
          * and get qualified class name for variable declaration
          */
-         getQualifiedJdkMethodSignatureReturnTypeAndVarType(filePath4JdkMethod);
+        getQualifiedJdkMethodSignatureReturnTypeAndVarType(filePath4JdkMethod);
 
         System.out.println(System.lineSeparator());
 

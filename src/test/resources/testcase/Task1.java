@@ -4,6 +4,30 @@ import java.io.*;
 
 public class Task1{
 
+//    public void test(String path) throws FileNotFoundException {
+//        File file = new File(path);
+//        file.mkdir();
+//
+//        String test1 = "hello world";
+//
+//        String test2 = null;
+//
+//        String test3;
+//        test3 = null;
+//
+//        String test4 = new String("hello world");
+//
+//        String test5 = test1.toLowerCase();
+//
+//        String test6 = test1.toLowerCase().toUpperCase();
+//
+//        String test7 = Integer.valueOf(test1).toString();
+//
+//        String test8 = test1.substring(test1.indexOf(" "));
+//
+//
+//    }
+
     public String readContentFromFile(String path) throws FileNotFoundException {
         File file = new File(path);
         StringBuilder stringBuilder = new StringBuilder();

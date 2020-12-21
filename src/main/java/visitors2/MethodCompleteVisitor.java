@@ -3,6 +3,7 @@ package visitors2;
 import codeanalysis.representation.Graph;
 import codeanalysis.representation.GraphNode;
 import codeanalysis.representation.GraphNodeHelper;
+import codeanalysis.representation.node.controlunitnode.DoWhileNode;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
@@ -22,7 +23,7 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
 
     private StringBuilder nodeName;
 
-    private List<String> nodeNameList = new ArrayList<>();
+    public List<String> nodeNameList = new ArrayList<>();
 
     private boolean checkNodeName(){
         return !nodeName.toString().isEmpty() && !nodeName.toString().startsWith(".");
@@ -38,8 +39,8 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
         System.out.println("[BLOCK]");
         super.visit(n, graph);
 
-        System.out.println();
-        nodeNameList.forEach(System.out::println);
+//        System.out.println();
+//        nodeNameList.forEach(System.out::println);
     }
 
     @Override
@@ -56,7 +57,8 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
     public void visit(DoStmt n, Graph graph) {
 //        System.out.println("[DO WHILE] " + n.toString());
         System.out.println("[DO WHILE]");
-        GraphNode graphNode = new GraphNode();
+        GraphNode graphNode = new DoWhileNode();
+        graphNode.setNodeName("doWhile");
         graph.addNode(graphNode);
         super.visit(n, graph);
     }
@@ -83,6 +85,7 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
          *  for "file.mkdir();" is the return type of method mkdir().
          *
          */
+
         System.out.println("\n[EXPRESSION] " + n.getExpression().toString());
 
         graphNodeHelper.setCurrentStmt(n);
@@ -196,9 +199,7 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
         nodeName.append(n.calculateResolvedType().describe());
 
         System.out.println("            <<" + nodeName.toString() + "...");
-
         super.visit(n, graph);
-
         System.out.println("            ..." + nodeName.toString() + ">>");
 
         if(checkNodeName())
@@ -321,7 +322,7 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
         nodeName = new StringBuilder();
         nodeName.append(n.resolve().getQualifiedSignature());
 
-        System.out.println(nodeName);
+        // System.out.println(nodeName);
         if(checkNodeName())
             nodeNameList.add(nodeName.toString());
 
@@ -369,22 +370,33 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
 
     @Override
     public void visit(ObjectCreationExpr n, Graph graph) {
+        // store the type of object
+        String savedClazzName = nodeName.toString();
+
+        // examine the method call inside the constructor at first
+        super.visit(n, graph);
+
         System.out.println("    <ObjectCreationExpr> "+ n.toString());
         // System.out.println("        % " + n.calculateResolvedType().describe());
+
+        // restore the type of object
+        nodeName = new StringBuilder();
+        nodeName.append(savedClazzName);
+
         try{
-//            System.out.println("        % " + n.resolve().getQualifiedSignature());
+            // System.out.println("        % " + n.resolve().getQualifiedSignature());
             String objCreationName = n.resolve().getQualifiedSignature();
             nodeName.append(".new").append("(").append(objCreationName, objCreationName.indexOf("(") + 1, objCreationName.indexOf(")") + 1 );
             if(checkNodeName())
                 nodeNameList.add(nodeName.toString());
             nodeName = new StringBuilder();
         } catch (UnsolvedSymbolException e){
-            System.out.println("        % can't resolve the type of " + n.toString());
-            // todo: check if this is correct
+            // System.out.println("        % can't resolve the type of " + n.toString());
+            if(checkNodeName()){
+                nodeNameList.add("UnresolvableType");
+            }
             nodeName = new StringBuilder();
         }
-
-        super.visit(n, graph);
     }
 
     @Override
@@ -424,11 +436,6 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
     public void visit(VariableDeclarationExpr n, Graph graph) {
         // System.out.println("    <VariableDeclarationExpr> "+ n.toString());
         // System.out.println("        $ " + n.calculateResolvedType().describe());
-
-        GraphNode graphNode = new GraphNode();
-        graphNode.setNodeName(n.calculateResolvedType().describe());
-//        graphNode.setJapaStatement(n);
-        graph.addNode(graphNode);
 
         super.visit(n, graph);
     }
@@ -479,18 +486,18 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
 
         System.out.println("    <VariableDeclarator>");
 
-         if(!n.getInitializer().isPresent()){
-//        if(n.getInitializer().isPresent()){
+        if(!n.getInitializer().isPresent()){
+        // if(n.getInitializer().isPresent()){
             // System.out.println("        $ .Declaration");
             nodeName.append(".Declaration");
         }
-//        else if(n.getInitializer().get().isLiteralExpr()){
-//            if(n.getInitializer().get().isNullLiteralExpr()){
-//                nodeName.append(".NULL");
-//            } else {
-//                nodeName.append(".Constant");
-//            }
-//        }
+        // else if(n.getInitializer().get().isLiteralExpr()){
+            // if(n.getInitializer().get().isNullLiteralExpr()){
+                // nodeName.append(".NULL");
+            // } else {
+                // nodeName.append(".Constant");
+            // }
+        // }
         System.out.println("            <<" + nodeName.toString() + "...");
         super.visit(n, graph);
         System.out.println("            ..." + nodeName.toString() + ">>");

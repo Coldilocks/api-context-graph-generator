@@ -2,6 +2,7 @@ package visitor;
 
 import codeanalysis.constructor.GraphConstructor;
 import codeanalysis.representation.Graph;
+import codeanalysis.representation.GraphNode;
 import com.github.javaparser.JavaToken;
 import com.github.javaparser.Range;
 import com.github.javaparser.StaticJavaParser;
@@ -24,6 +25,7 @@ import util.DataConfig;
 import visitors.*;
 import visitors2.MethodCompleteVisitor;
 import visitors2.MethodStmtVisitor;
+import visitors3.MethodGenericVisitor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,7 +60,10 @@ public class MultiVisitorTest {
         // jdkMethodVisitorAndSymbolSolver();
 
         // using MethodCompleteVisitor
-         getJdkAndCustomType();
+        // getJdkAndCustomType();
+
+        // using MethodGenericVisitor
+        getJdkAndCustomType2();
 
         // pre order the tree
         // preOrder();
@@ -71,6 +76,7 @@ public class MultiVisitorTest {
 //        System.out.println(test9);
 //        System.out.println(test10);
 //        System.out.println(test13);
+
 
 
 
@@ -209,6 +215,44 @@ public class MultiVisitorTest {
                     method.accept(visitor, graph);
 
                     System.out.println("<<<<<<<< END >>>>>>>>");
+
+                    System.out.println();
+
+                    visitor.nodeNameList.forEach(System.out::println);
+
+                }));
+
+
+
+    }
+
+
+    public static void getJdkAndCustomType2() throws IOException {
+
+        String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
+
+        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
+        typeSolver.add(new ReflectionTypeSolver());
+        typeSolver.add(JarTypeSolver.getJarTypeSolver(jarFile));
+
+        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
+        StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
+
+        CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
+
+        cu.getTypes().forEach(type ->
+                type.getMethods().forEach(method -> {
+                    System.out.println("<<<<<<<< START >>>>>>>>");
+                    Graph graph = new Graph();
+
+                    MethodGenericVisitor visitor = new MethodGenericVisitor();
+                    List<GraphNode> graphNodes = method.accept(visitor, graph);
+
+                    System.out.println("<<<<<<<< END >>>>>>>>");
+
+                    System.out.println();
+
+                    visitor.nodeNameList.forEach(System.out::println);
 
                 }));
 

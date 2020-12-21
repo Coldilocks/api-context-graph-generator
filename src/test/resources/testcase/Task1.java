@@ -29,6 +29,12 @@ public class Task1{
 //    }
 
     public String readContentFromFile(String path) throws FileNotFoundException {
+//        String str = "hello";
+//        if(str != null && str.length() > 0){
+//
+//        }
+
+        // StringBuilder str = new StringBuilder("text".toString());
         File file = new File(path);
         StringBuilder stringBuilder = new StringBuilder();
         do{

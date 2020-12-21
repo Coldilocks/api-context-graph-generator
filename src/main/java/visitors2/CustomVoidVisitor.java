@@ -190,8 +190,12 @@ public abstract class CustomVoidVisitor<A> implements VoidVisitor<A> {
 
     @Override
     public void visit(final DoStmt n, final A arg) {
-        n.getBody().accept(this, arg);
+        /*
+         * we examine the condition firstly, then the body
+         */
         n.getCondition().accept(this, arg);
+        n.getBody().accept(this, arg);
+        // n.getCondition().accept(this, arg);
         // n.getComment().ifPresent(l -> l.accept(this, arg));
     }
 

@@ -137,19 +137,61 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
     @Override
     public List<GraphNode> visit(IfStmt n, Graph graph) {
+//        System.out.println("[IF]");
+//
+//        List<GraphNode> graphNodes = new ArrayList<>();
+//        GraphNode currentNode = new GraphNode("If");
+//
+//        List<GraphNode> childNodes = super.visit(n, graph);
+//        if(childNodes != null){
+//            for(GraphNode tempNode : childNodes){
+//                currentNode.addChildNode(tempNode);
+//            }
+//        }
+//
+//        graphNodes.add(currentNode);
+//
+//        return graphNodes;
         System.out.println("[IF]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
-        GraphNode currentNode = new GraphNode("If");
 
-        List<GraphNode> childNodes = super.visit(n, graph);
-        if(childNodes != null){
-            for(GraphNode tempNode : childNodes){
-                currentNode.addChildNode(tempNode);
+        GraphNode ifNode = new GraphNode("If");
+
+        // examine the condition expression and get condition node
+        GraphNode conditionNode = new GraphNode("Condition");
+        List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
+        if(conditionChildNodes != null){
+            for(GraphNode tempNode : conditionChildNodes){
+                conditionNode.addChildNode(tempNode);
             }
+            ifNode.addChildNode(conditionNode);
         }
 
-        graphNodes.add(currentNode);
+        // examine the then stmt and get condition node
+        GraphNode thenNode = new GraphNode("Then");
+        List<GraphNode> thenChildNodes = n.getThenStmt().accept(this, graph);
+        if(thenChildNodes != null){
+            for(GraphNode tempNode : thenChildNodes){
+                thenNode.addChildNode(tempNode);
+            }
+            ifNode.addChildNode(thenNode);
+        }
+
+        // examine the else stmt and get condition node
+        GraphNode elseNode = new GraphNode("Else");
+        List<GraphNode> elseChildNodes = null;
+        if(n.getElseStmt().isPresent()){
+            elseChildNodes = n.getElseStmt().get().accept(this, graph);
+        }
+        if(elseChildNodes != null){
+            for(GraphNode tempNode : elseChildNodes){
+                elseNode.addChildNode(tempNode);
+            }
+            ifNode.addChildNode(elseNode);
+        }
+
+        graphNodes.add(ifNode);
 
         return graphNodes;
     }

@@ -28,6 +28,12 @@ public class GraphNode implements Cloneable, Serializable {
         this.linkedNodes = new ArrayList<>();
     }
 
+    public GraphNode(String nodeName){
+        this.childNodes = new ArrayList<>();
+        this.linkedNodes = new ArrayList<>();
+        this.nodeName = nodeName;
+    }
+
     public GraphNode getParentNode() {
         return parentNode;
     }

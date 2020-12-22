@@ -29,10 +29,12 @@ public class Task1{
 //    }
 
     public String readContentFromFile(String path) throws FileNotFoundException {
-        String str = "hello";
-        if(str != null && str.length() > 0)
-            System.out.println("hello world");
 
+        for(int i = 0; i < 10; i++){
+            System.out.println(i);
+        }
+
+        // System.out.println("hello world");
 
         // StringBuilder str = new StringBuilder("text".toString());
         File file = new File(path);

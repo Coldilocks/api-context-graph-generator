@@ -809,7 +809,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
         List<R> result = new ArrayList<>();
         List<R> tmp;
         {
-            tmp = n.getBody().accept(this, arg);
+            tmp = n.getInitialization().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
         }
@@ -819,7 +819,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
                 result.addAll(tmp);
         }
         {
-            tmp = n.getInitialization().accept(this, arg);
+            tmp = n.getBody().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
         }
@@ -1561,6 +1561,11 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
         List<R> result = new ArrayList<>();
         List<R> tmp;
         {
+            tmp = n.getTryBlock().accept(this, arg);
+            if (tmp != null)
+                result.addAll(tmp);
+        }
+        {
             tmp = n.getCatchClauses().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
@@ -1575,11 +1580,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        {
-            tmp = n.getTryBlock().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
+
         //if (n.getComment().isPresent()) {
         //    tmp = n.getComment().get().accept(this, arg);
         //    if (tmp != null)

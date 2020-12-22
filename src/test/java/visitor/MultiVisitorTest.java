@@ -3,19 +3,12 @@ package visitor;
 import codeanalysis.constructor.GraphConstructor;
 import codeanalysis.representation.Graph;
 import codeanalysis.representation.GraphNode;
-import com.github.javaparser.JavaToken;
-import com.github.javaparser.Range;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
-import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.TreeVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
-import com.github.javaparser.printer.lexicalpreservation.PhantomNodeLogic;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -63,26 +56,10 @@ public class MultiVisitorTest {
         // getJdkAndCustomType();
 
         // using MethodGenericVisitor
-        getJdkAndCustomType2();
+        getControlFlow();
 
         // pre order the tree
         // preOrder();
-
-//        String test8 = "hello world", test9 = "hello world";
-//        String test10 = "hello world", test11;
-//        String test12, test13 = "hello world";
-//
-//        System.out.println(test8);
-//        System.out.println(test9);
-//        System.out.println(test10);
-//        System.out.println(test13);
-
-
-
-
-
-
-
 
     }
 
@@ -193,6 +170,10 @@ public class MultiVisitorTest {
 
     }
 
+    /**
+     * print all the qualified name for variable, method call
+     * @throws IOException
+     */
     public static void getJdkAndCustomType() throws IOException {
 
         String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
@@ -227,7 +208,11 @@ public class MultiVisitorTest {
     }
 
 
-    public static void getJdkAndCustomType2() throws IOException {
+    /**
+     * get the control flow graph for a method
+     * @throws IOException
+     */
+    public static void getControlFlow() throws IOException {
 
         String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
 

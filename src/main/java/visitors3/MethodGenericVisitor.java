@@ -35,19 +35,30 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
     @Override
     public List<GraphNode> visit(BlockStmt n, Graph graph) {
+//        System.out.println("[BLOCK]");
+//        List<GraphNode> graphNodes = new ArrayList<>();
+//        GraphNode currentNode = new GraphNode("Body");
+//
+//        // super.visit(n, graph);
+//        List<GraphNode> childNodes = super.visit(n, graph);
+//        if(childNodes != null){
+//            for(GraphNode tempNode : childNodes){
+//                currentNode.addChildNode(tempNode);
+//            }
+//        }
+//
+//        graphNodes.add(currentNode);
+//        return graphNodes;
+
         System.out.println("[BLOCK]");
         List<GraphNode> graphNodes = new ArrayList<>();
-        GraphNode currentNode = new GraphNode("Body");
 
         // super.visit(n, graph);
         List<GraphNode> childNodes = super.visit(n, graph);
         if(childNodes != null){
-            for(GraphNode tempNode : childNodes){
-                currentNode.addChildNode(tempNode);
-            }
+            graphNodes.addAll(childNodes);
         }
 
-        graphNodes.add(currentNode);
         return graphNodes;
     }
 
@@ -75,16 +86,29 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode currentNode = new GraphNode("doWhile");
+        GraphNode doWhileNode = new GraphNode("doWhile");
 
-        List<GraphNode> childNodes = super.visit(n, graph);
-        if(childNodes != null){
-            for(GraphNode tempNode : childNodes){
-                currentNode.addChildNode(tempNode);
+        // examine the condition expression and get condition node
+        GraphNode conditionNode = new GraphNode("Condition");
+        List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
+        if(conditionChildNodes != null){
+            for(GraphNode tempNode : conditionChildNodes){
+                conditionNode.addChildNode(tempNode);
             }
+            doWhileNode.addChildNode(conditionNode);
         }
 
-        graphNodes.add(currentNode);
+        // examine the body and get body node
+        GraphNode bodyNode = new GraphNode("Body");
+        List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
+        if(bodyChildNodes != null){
+            for(GraphNode tempNode : bodyChildNodes){
+                bodyNode.addChildNode(tempNode);
+            }
+            doWhileNode.addChildNode(bodyNode);
+        }
+
+        graphNodes.add(doWhileNode);
         
         return graphNodes;
     }
@@ -168,7 +192,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
             ifNode.addChildNode(conditionNode);
         }
 
-        // examine the then stmt and get condition node
+        // examine the then stmt and get then node
         GraphNode thenNode = new GraphNode("Then");
         List<GraphNode> thenChildNodes = n.getThenStmt().accept(this, graph);
         if(thenChildNodes != null){
@@ -178,7 +202,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
             ifNode.addChildNode(thenNode);
         }
 
-        // examine the else stmt and get condition node
+        // examine the else stmt and get else node
         GraphNode elseNode = new GraphNode("Else");
         List<GraphNode> elseChildNodes = null;
         if(n.getElseStmt().isPresent()){
@@ -244,19 +268,46 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
     @Override
     public List<GraphNode> visit(TryStmt n, Graph graph) {
-//        System.out.println("[TRY] " + n.toString());
         System.out.println("[TRY]");
         List<GraphNode> graphNodes = new ArrayList<>();
-        GraphNode currentNode = new GraphNode("Try");
+        GraphNode tryNode = new GraphNode("Try");
 
-        List<GraphNode> childNodes = super.visit(n, graph);
-        if(childNodes != null){
-            for(GraphNode tempNode : childNodes){
-                currentNode.addChildNode(tempNode);
+        // examine the try block and get try body node
+        GraphNode tryBodyNode = new GraphNode("Body");
+        List<GraphNode> tryBodyChildNodes = n.getTryBlock().accept(this, graph);
+        if(tryBodyChildNodes != null){
+            for(GraphNode tempNode : tryBodyChildNodes){
+                tryBodyNode.addChildNode(tempNode);
             }
+            tryNode.addChildNode(tryBodyNode);
         }
 
-        graphNodes.add(currentNode);
+        // examine the catch clauses and get catch nodes
+        n.getCatchClauses().forEach(catchClause -> {
+            GraphNode catchClausesNode = new GraphNode("Catch");
+            List<GraphNode> catchClausesChildNodes = catchClause.accept(this, graph);
+            if(catchClausesChildNodes != null){
+                for(GraphNode tempNode : catchClausesChildNodes){
+                    catchClausesNode.addChildNode(tempNode);
+                }
+                tryNode.addChildNode(catchClausesNode);
+            }
+        });
+
+        // examine the try block and get try body node
+        GraphNode finallyNode = new GraphNode("Finally");
+        List<GraphNode> finallyChildNodes = null;
+        if(n.getFinallyBlock().isPresent()){
+            finallyChildNodes = n.getFinallyBlock().get().accept(this, graph);
+        }
+        if(finallyChildNodes != null){
+            for(GraphNode tempNode : finallyChildNodes){
+                finallyNode.addChildNode(tempNode);
+            }
+            tryNode.addChildNode(finallyNode);
+        }
+
+        graphNodes.add(tryNode);
         return graphNodes;
     }
 
@@ -752,19 +803,30 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
     @Override
     public List<GraphNode> visit(CatchClause n, Graph graph) {
+//        System.out.println("[CATCH]");
+//
+//        List<GraphNode> graphNodes = new ArrayList<>();
+//        GraphNode currentNode = new GraphNode("Catch");
+//
+//        List<GraphNode> childNodes = super.visit(n, graph);
+//        if(childNodes != null){
+//            for(GraphNode tempNode : childNodes){
+//                currentNode.addChildNode(tempNode);
+//            }
+//        }
+//
+//        graphNodes.add(currentNode);
+//
+//        return graphNodes;
+
         System.out.println("[CATCH]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
-        GraphNode currentNode = new GraphNode("Catch");
 
         List<GraphNode> childNodes = super.visit(n, graph);
         if(childNodes != null){
-            for(GraphNode tempNode : childNodes){
-                currentNode.addChildNode(tempNode);
-            }
+            graphNodes.addAll(childNodes);
         }
-
-        graphNodes.add(currentNode);
 
         return graphNodes;
     }

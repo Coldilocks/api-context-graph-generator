@@ -19,6 +19,7 @@ import visitors.*;
 import visitors2.MethodCompleteVisitor;
 import visitors2.MethodStmtVisitor;
 import visitors3.MethodGenericVisitor;
+import visitorsx.MethodVisitorX;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -230,7 +231,8 @@ public class MultiVisitorTest {
                     System.out.println("<<<<<<<< START >>>>>>>>");
                     Graph graph = new Graph();
 
-                    MethodGenericVisitor visitor = new MethodGenericVisitor();
+                    MethodVisitorX visitor = new MethodVisitorX();
+                    // graphNodes is the final result
                     List<GraphNode> graphNodes = method.accept(visitor, graph);
 
                     System.out.println("<<<<<<<< END >>>>>>>>");

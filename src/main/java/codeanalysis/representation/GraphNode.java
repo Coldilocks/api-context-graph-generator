@@ -22,6 +22,8 @@ public class GraphNode implements Cloneable, Serializable {
     private String nodeName;
     /** javaparser statement node */
     private Statement japaStatement;
+    /** node type **/
+    private String nodeType;
 
     public GraphNode(){
         this.childNodes = new ArrayList<>();
@@ -32,6 +34,13 @@ public class GraphNode implements Cloneable, Serializable {
         this.childNodes = new ArrayList<>();
         this.linkedNodes = new ArrayList<>();
         this.nodeName = nodeName;
+    }
+
+    public GraphNode(String nodeName, String nodeType){
+        this.childNodes = new ArrayList<>();
+        this.linkedNodes = new ArrayList<>();
+        this.nodeName = nodeName;
+        this.nodeType = nodeType;
     }
 
     public GraphNode getParentNode() {
@@ -82,6 +91,14 @@ public class GraphNode implements Cloneable, Serializable {
         this.japaStatement = japaStatement;
     }
 
+    public String getNodeType() {
+        return nodeType;
+    }
+
+    public void setNodeType(String nodeType) {
+        this.nodeType = nodeType;
+    }
+
     public void addChildNode(GraphNode graphNode){
         this.childNodes.add(graphNode);
     }
@@ -91,5 +108,15 @@ public class GraphNode implements Cloneable, Serializable {
         return "GraphNode{" +
                 "nodeName='" + nodeName + '\'' +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }

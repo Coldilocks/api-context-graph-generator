@@ -1,6 +1,9 @@
 package Experiment;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.io.*;
+import java.util.ArrayList;
 
 public class Task1{
 
@@ -29,14 +32,19 @@ public class Task1{
 //    }
 
     public String readContentFromFile(String path) throws FileNotFoundException {
+//        StringBuilder str = new StringBuilder("text".toString());
+//        System.out.println("hello world");
+//
+//        int[][] test = new int[3][4];
+//        int index = 0;
+//        int a = test[index];
 
-        for(int i = 0; i < 10; i++){
-            System.out.println(i);
-        }
+//        String test = "test";
+//        String helloStr = test.toLowerCase();
 
-        // System.out.println("hello world");
-
-        // StringBuilder str = new StringBuilder("text".toString());
+        // List<String> list = new ArrayList<String>();
+//        int i = 10, j =10;
+//
         File file = new File(path);
         StringBuilder stringBuilder = new StringBuilder();
         do{

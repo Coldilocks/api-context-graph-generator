@@ -3,7 +3,6 @@ package visitors2;
 import codeanalysis.representation.Graph;
 import codeanalysis.representation.GraphNode;
 import codeanalysis.representation.GraphNodeHelper;
-import codeanalysis.representation.node.controlunitnode.DoWhileNode;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
@@ -57,7 +56,7 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
     public void visit(DoStmt n, Graph graph) {
 //        System.out.println("[DO WHILE] " + n.toString());
         System.out.println("[DO WHILE]");
-        GraphNode graphNode = new DoWhileNode();
+        GraphNode graphNode = new GraphNode();
         graphNode.setNodeName("doWhile");
         graph.addNode(graphNode);
         super.visit(n, graph);

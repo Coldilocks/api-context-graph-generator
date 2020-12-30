@@ -25,6 +25,9 @@ public class GraphNode implements Cloneable, Serializable {
     /** node type **/
     private String nodeType;
 
+    /** variable identifier **/
+    private String varIdentifier;
+
     public GraphNode(){
         this.childNodes = new ArrayList<>();
         this.linkedNodes = new ArrayList<>();
@@ -41,6 +44,15 @@ public class GraphNode implements Cloneable, Serializable {
         this.linkedNodes = new ArrayList<>();
         this.nodeName = nodeName;
         this.nodeType = nodeType;
+    }
+
+    public GraphNode(String nodeName, String varIdentifier, String nodeType, String originalStatement){
+        this.childNodes = new ArrayList<>();
+        this.linkedNodes = new ArrayList<>();
+        this.nodeName = nodeName;
+        this.varIdentifier = varIdentifier;
+        this.nodeType = nodeType;
+        this.originalStatement = originalStatement;
     }
 
     public GraphNode getParentNode() {
@@ -97,6 +109,14 @@ public class GraphNode implements Cloneable, Serializable {
 
     public void setNodeType(String nodeType) {
         this.nodeType = nodeType;
+    }
+
+    public String getVarIdentifier() {
+        return varIdentifier;
+    }
+
+    public void setVarIdentifier(String varIdentifier) {
+        this.varIdentifier = varIdentifier;
     }
 
     public void addChildNode(GraphNode graphNode){

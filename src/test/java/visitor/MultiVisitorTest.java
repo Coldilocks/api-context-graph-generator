@@ -61,7 +61,6 @@ public class MultiVisitorTest {
 
         // pre order the tree
         // preOrder();
-
     }
 
     public static void run(String[] args) throws FileNotFoundException {

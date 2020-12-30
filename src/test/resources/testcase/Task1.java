@@ -64,7 +64,7 @@ public class Task1{
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
                 String line = "";
                 while((line = bufferedReader.readLine())!=null){
-                    stringBuilder.append(line);
+                    stringBuilder.append(line).append("xxx");
                     stringBuilder.append("\r\n");
                 }
             }catch (Exception e){

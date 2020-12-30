@@ -599,7 +599,6 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         List<GraphNode> graphNodes = new ArrayList<>();
         List<GraphNode> childNodes = super.visit(n, graph);
         if(childNodes != null){
-            // todo: 将每一个graph加到前一个graph的子节点
             graphNodes.addAll(childNodes);
         }
 
@@ -676,7 +675,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
 
         if(checkNodeName(currentNodeName.toString())){
             nodeNameList.add(currentNodeName.toString());
-            graphNodes.add(new GraphNode(currentNodeName.toString(), "Method Call"));
+            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "MethodCall", n.toString()));
         }
 
         return graphNodes;
@@ -730,14 +729,21 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         try{
             objCreationName = n.resolve().getQualifiedSignature();
             // currentNodeName.append(".").append("new").append("(").append(objCreationName, objCreationName.indexOf("(") + 1, objCreationName.indexOf(")") + 1 );
-
         } catch (UnsolvedSymbolException e){
             objCreationName = "UnresolvableType.new()";
         }
 
         currentNodeName.append(objCreationName);
         nodeNameList.add(currentNodeName.toString());
-        graphNodes.add(new GraphNode(currentNodeName.toString(), "Object Creation"));
+
+        if(n.getParentNode().isPresent()){
+            String originalStmt = n.getParentNode().get().toString();
+            String varIdentifier = ((VariableDeclarator) n.getParentNode().get()).getNameAsString();
+            graphNodes.add(new GraphNode(currentNodeName.toString(), varIdentifier, "ObjCreation", originalStmt));
+        } else {
+            graphNodes.add(new GraphNode(currentNodeName.toString(), "unknown", "ObjCreation", n.toString()));
+        }
+
 
         return graphNodes;
     }
@@ -870,7 +876,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         // just declare a variable, but don't initialize it, for example: String str;
         if(!n.getInitializer().isPresent()){
             currentNodeName.append(".").append("Declaration");
-            graphNodes.add(new GraphNode(currentNodeName.toString()));
+            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString()));
             // todo: delete it
             nodeNameList.add(currentNodeName.toString());
         }
@@ -883,11 +889,11 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
             // only literalExpr will be added in this scope, other expressions (MethodCallExpr, ObjectCreationExpr) will be added in corresponding method
             if(init.isLiteralExpr() && !init.isNullLiteralExpr() && !init.isTextBlockLiteralExpr()){
                 currentNodeName.append(".").append("Constant");
-                graphNodes.add(new GraphNode(currentNodeName.toString()));
+                graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString()));
                 nodeNameList.add(currentNodeName.toString());
             } else if(init.isNullLiteralExpr()){
                 currentNodeName.append(".").append("Declaration").append(".").append("NULL");
-                graphNodes.add(new GraphNode(currentNodeName.toString()));
+                graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString()));
                 nodeNameList.add(currentNodeName.toString());
             }
         });

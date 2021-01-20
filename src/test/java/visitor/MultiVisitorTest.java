@@ -14,12 +14,12 @@ import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.github.javaparser.utils.Pair;
 import util.DataConfig;
+import util.GraphvizUtil;
 import visitors.*;
 import visitors2.MethodCompleteVisitor;
 import visitors2.MethodStmtVisitor;
-import visitors3.MethodGenericVisitor;
-import visitorsx.MethodVisitorX;
 import visitorsz.MethodVisitorZ;
 //import visitorsx.MethodVisitorX;
 
@@ -274,25 +274,34 @@ public class MultiVisitorTest {
 
         cu.getTypes().forEach(type ->
                 type.getMethods().forEach(method -> {
-                    System.out.println("\n<<<<<<<< 1.Visiting >>>>>>>>\n");
                     Graph graph = new Graph();
 
                     MethodVisitorZ visitor = new MethodVisitorZ(graph);
                     // get graph node of current method, graphNodes list only have one element, i.e. root node.
                     List<GraphNode> graphNodes = method.accept(visitor, "");
 
-                    System.out.println("\n<<<<<<<< 2.Nodes in List >>>>>>>>\n");
+                    System.out.println("\n<<<<<<<< 1. Node Names in List >>>>>>>>\n");
 
                     visitor.nodeNameList.forEach(System.out::println);
 
-                    System.out.println("\n<<<<<<<< 3.Nodes in Tree >>>>>>>>\n");
+                    System.out.println("\n<<<<<<<< 2. Nodes in Depth-First Order >>>>>>>>\n");
 
                     GraphNode rootNode = graphNodes.get(0);
-                    rootNode.traversalTree(rootNode);
+                    graph.depthFirstTraversal(rootNode);
 
-                    System.out.println("\n<<<<<<<< 4.Data dependency >>>>>>>>\n");
+                    System.out.println("\n<<<<<<<< 3. Nodes in Breadth-First Order >>>>>>>>\n");
 
-                    graph.getDataFlowMatrix().forEach(System.out::println);
+                    // graph.breadthFirstTraversal(rootNode).forEach(node -> System.out.println(node.getNodeInfo()));
+                    List<GraphNode> graphNodeList = graph.breadthFirstTraversal(rootNode);
+
+                    System.out.println("\n<<<<<<<< 4. Data and Control Flow Edge >>>>>>>>\n");
+                    Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
+
+                    try {
+                        GraphvizUtil.createGraph("/Users/coldilock/Downloads/first_result.dot", graphNodeList, edgeMap);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
 
                 }));

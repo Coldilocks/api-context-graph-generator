@@ -1,6 +1,10 @@
 package codeanalysis.representation;
 
+import com.github.javaparser.utils.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author coldilock
@@ -11,25 +15,32 @@ public class Graph {
     /** last node of the method graph */
     private GraphNode lastNode;
     /**
-     * lookup table for variables
+     * Lookup Table for variables
      *
+     * structure:
+     *  { var_name : [node1_in_global_scope, node2_in_method_scope, ...] }
      * key: variable name
-     * value: all the nodes with the same name, the last node is in the latest scope.
+     * value: all the nodes with the same name, the last node is in the current scope.
      *
      * when the var is defined in this scope, once we jump out of the scope, we should delete the last node in the list.
-     *
-     * example:
-     * var_name : [node1_in_global_scope, node2_in_method_scope, ...]
      **/
     private Map<String, List<String>> symbolTable = new HashMap<>();
     /**
-     * new variable in current scope
-     * the first dimension stands for scope, the second dimension stands for variable names defined in this scope
-     * when we jump out of a scope, we should delete the last list in the first dimension, and delete the last node in the lookupTable of which the key are in the deleted list.
+     * New variables in the corresponding scope where they are defined
+     *  the first dimension stands for scope, the second dimension stands for variable names defined in this scope
+     *  when we jump out of a scope, we should delete the last list in the first dimension, and delete the last node in the lookupTable if their key are in the deleted list.
+     *
+     *  structure:
+     *      [[var1_in_first_scope, var2_in_first_scope, ...], [var1_in_second_scope, var2_in_second_scope, ...], ...]
      **/
     private List<List<String>> newVarInCurrentScope = new ArrayList<>();
 
-    private List<List<String>> dataFlowMatrix = new ArrayList<>();
+//    private List<List<String>> dataFlowMatrix = new ArrayList<>();
+
+    private List<Pair<String, String>> controlFlowPairs = new ArrayList<>();
+
+    /** Data flow pairs, (source_node_id, target_node_id) */
+    private List<Pair<String, String>> dataFlowPairs = new ArrayList<>();
 
     public GraphNode getRootNode() {
         return rootNode;
@@ -74,16 +85,27 @@ public class Graph {
         return rootNode;
     }
 
+    /**
+     * Create a new list and add it to newVarInCurrentScope when we enter into a new scope.
+     */
     public void addNewScope(){
         List<String> scope = new ArrayList<>();
         newVarInCurrentScope.add(scope);
     }
 
+    /**
+     * Add the new variable name to current scope in both symbolTable and newVarInCurrentScope.
+     * @param varName
+     * @param graphNodeId
+     */
     public void addNewVarInCurrentScope(String varName, String graphNodeId){
         symbolTable.computeIfAbsent(varName, v -> new ArrayList<>()).add(graphNodeId);
         newVarInCurrentScope.get(newVarInCurrentScope.size() - 1).add(varName);
     }
 
+    /**
+     * Delete all the variables defined in the current scope when it is over
+     */
     public void jumpOutOfScope(){
         List<String> varNames = newVarInCurrentScope.get(newVarInCurrentScope.size() - 1);
         for(String varName : varNames){
@@ -92,27 +114,139 @@ public class Graph {
         newVarInCurrentScope.remove(newVarInCurrentScope.size() - 1);
     }
 
+    /**
+     * Search varName in symbolTable to get the id of the node (source node id) in which the variable are newly declared,
+     * and create a edge between the source node and target node (currentNodeId).
+     *
+     * Add (DeclaredNodeId,CurrentNodeId) to controlFlowPairs.
+     * @param currentNodeId
+     * @param varName
+     */
     public void linkDataFlow(String currentNodeId, String varName){
         List<String> nodesIdWithSameVarName = symbolTable.get(varName);
         if(!currentNodeId.isEmpty() && nodesIdWithSameVarName != null){
             String declaredNodeId = nodesIdWithSameVarName.get(nodesIdWithSameVarName.size() - 1);
             if(!declaredNodeId.equals(currentNodeId)){
-                List<String> temp = new ArrayList<>();
-                temp.add(varName);
-                temp.add(declaredNodeId);
-                temp.add(currentNodeId);
-                dataFlowMatrix.add(temp);
+//                List<String> temp = new ArrayList<>();
+//                temp.add(varName);
+//                temp.add(declaredNodeId);
+//                temp.add(currentNodeId);
+//                dataFlowMatrix.add(temp);
+
+                dataFlowPairs.add(new Pair<>(declaredNodeId, currentNodeId));
             }
         }
     }
 
-    public List<List<String>> getDataFlowMatrix() {
-        return dataFlowMatrix;
+//    public List<List<String>> getDataFlowMatrix() {
+//        return dataFlowMatrix;
+//    }
+
+    public List<Pair<String, String>> getDataFlowPairs(){
+        return dataFlowPairs;
+    }
+    /**
+     * Breadth-first traversal
+     * @param root
+     * @return
+     */
+    public List<GraphNode> breadthFirstTraversal(GraphNode root){
+
+        List<GraphNode> graphNodeList = new ArrayList<>();
+
+        if(root == null)
+            return graphNodeList;
+
+        Queue<GraphNode> nodeQueue = new LinkedList<>();
+        nodeQueue.add(root);
+
+        while(!nodeQueue.isEmpty()){
+            GraphNode graphNode = nodeQueue.poll();
+            graphNodeList.add(graphNode);
+            for(GraphNode childNode : CollectionUtils.emptyIfNull(graphNode.getChildNodes())){
+                nodeQueue.offer(childNode);
+            }
+        }
+
+        return graphNodeList;
     }
 
-    private String currentMethodCallNodeId = "";
-    private String currentObjCreationNodeId = "";
+    /**
+     * Print node in Depth-first order
+     * @param root
+     */
+    public void depthFirstTraversal(GraphNode root){
+        if(root == null)
+            return;
 
+        System.out.println(root.getNodeInfo());
 
+        for(GraphNode graphNode : CollectionUtils.emptyIfNull(root.getChildNodes())){
+            depthFirstTraversal(graphNode);
+        }
+    }
+
+    /**
+     * Get control flow edge, represented by node pair
+     * <source node, target node>
+     * @param root
+     * @return
+     */
+    public List<Pair<String, String>> getControlFlow(GraphNode root){
+
+        this.controlFlowPairs =  this.breadthFirstTraversal(root).stream()
+                .flatMap(parentNode->parentNode.getChildNodes().stream()
+                        .map(childNode->new Pair<>(parentNode.getId(), childNode.getId()))
+
+                ).collect(Collectors.toList());
+
+        return this.controlFlowPairs;
+    }
+
+    /**
+     * Get control flow edge, represented by node pair
+     * <source node, target node>
+     * @param root
+     * @return
+     */
+    @Deprecated
+    public List<Pair<String, String>> getControlFlow2(GraphNode root){
+        this.controlFlowPairs = new ArrayList<>();
+
+        List<GraphNode> graphNodes = breadthFirstTraversal(root);
+
+        for(GraphNode graphNode : CollectionUtils.emptyIfNull(graphNodes)){
+            for(GraphNode childNode : CollectionUtils.emptyIfNull(graphNode.getChildNodes())){
+                controlFlowPairs.add(new Pair<>(graphNode.getId(), childNode.getId()));
+            }
+        }
+
+        // System.out.println(controlFlowPairs.size());
+
+        return this.controlFlowPairs;
+    }
+
+    /**
+     * get data flow edge(d), control flow edge(c), data and control flow edge(cd)
+     * @return
+     */
+    public Map<String, List<Pair<String, String>>> getControlAndDataFlowPairs(GraphNode root){
+
+        this.getControlFlow(root);
+
+        List<Pair<String, String>> controlFlowAndDataFlowPairs = new ArrayList<>(this.controlFlowPairs);
+        controlFlowAndDataFlowPairs.retainAll(this.dataFlowPairs);
+
+        this.controlFlowPairs.removeAll(controlFlowAndDataFlowPairs);
+
+        this.dataFlowPairs.removeAll(controlFlowAndDataFlowPairs);
+
+        Map<String, List<Pair<String, String>>> result = new HashMap<>();
+        result.put("d", this.dataFlowPairs);
+        result.put("c", this.controlFlowPairs);
+        result.put("cd", controlFlowAndDataFlowPairs);
+
+        return result;
+    }
 
 }

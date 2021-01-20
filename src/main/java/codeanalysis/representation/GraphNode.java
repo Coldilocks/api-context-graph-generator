@@ -24,6 +24,8 @@ public class GraphNode implements Cloneable, Serializable {
     private Statement japaStatement;
     /** node type **/
     private String nodeType;
+    /** unique identifier **/
+    private String id;
 
     /** variable identifier **/
     private String varIdentifier;
@@ -39,20 +41,37 @@ public class GraphNode implements Cloneable, Serializable {
         this.nodeName = nodeName;
     }
 
-    public GraphNode(String nodeName, String nodeType){
+    public GraphNode(String nodeName, String id){
         this.childNodes = new ArrayList<>();
         this.linkedNodes = new ArrayList<>();
         this.nodeName = nodeName;
-        this.nodeType = nodeType;
+        this.id = id;
     }
 
-    public GraphNode(String nodeName, String varIdentifier, String nodeType, String originalStatement){
+//    public GraphNode(String nodeName, String nodeType){
+//        this.childNodes = new ArrayList<>();
+//        this.linkedNodes = new ArrayList<>();
+//        this.nodeName = nodeName;
+//        this.nodeType = nodeType;
+//    }
+
+//    public GraphNode(String nodeName, String varIdentifier, String nodeType, String originalStatement){
+//        this.childNodes = new ArrayList<>();
+//        this.linkedNodes = new ArrayList<>();
+//        this.nodeName = nodeName;
+//        this.varIdentifier = varIdentifier;
+//        this.nodeType = nodeType;
+//        this.originalStatement = originalStatement;
+//    }
+
+    public GraphNode(String nodeName, String varIdentifier, String nodeType, String originalStatement, String id){
         this.childNodes = new ArrayList<>();
         this.linkedNodes = new ArrayList<>();
         this.nodeName = nodeName;
         this.varIdentifier = varIdentifier;
         this.nodeType = nodeType;
         this.originalStatement = originalStatement;
+        this.id = id;
     }
 
     public GraphNode getParentNode() {
@@ -119,8 +138,35 @@ public class GraphNode implements Cloneable, Serializable {
         this.varIdentifier = varIdentifier;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public void addChildNode(GraphNode graphNode){
         this.childNodes.add(graphNode);
+    }
+
+    public void traversalTree(GraphNode graphNode){
+        if(graphNode == null)
+            return;
+
+        System.out.println(graphNode.getNodeInfo());
+
+        if(graphNode.getChildNodes() != null){
+            graphNode.getChildNodes().forEach(this::traversalTree);
+        }
+    }
+
+    public String getNodeInfo() {
+        return "GraphNode{" +
+                " id='" + id + '\'' +
+                "   nodeName='" + nodeName + '\'' +
+                "   originalStatement= '" + originalStatement + '\'' +
+                '}';
     }
 
     @Override

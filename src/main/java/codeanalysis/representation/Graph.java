@@ -1,10 +1,6 @@
 package codeanalysis.representation;
 
-import com.github.javaparser.ast.stmt.SwitchStmt;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author coldilock
@@ -14,6 +10,26 @@ public class Graph {
     private GraphNode rootNode;
     /** last node of the method graph */
     private GraphNode lastNode;
+    /**
+     * lookup table for variables
+     *
+     * key: variable name
+     * value: all the nodes with the same name, the last node is in the latest scope.
+     *
+     * when the var is defined in this scope, once we jump out of the scope, we should delete the last node in the list.
+     *
+     * example:
+     * var_name : [node1_in_global_scope, node2_in_method_scope, ...]
+     **/
+    private Map<String, List<String>> symbolTable = new HashMap<>();
+    /**
+     * new variable in current scope
+     * the first dimension stands for scope, the second dimension stands for variable names defined in this scope
+     * when we jump out of a scope, we should delete the last list in the first dimension, and delete the last node in the lookupTable of which the key are in the deleted list.
+     **/
+    private List<List<String>> newVarInCurrentScope = new ArrayList<>();
+
+    private List<List<String>> dataFlowMatrix = new ArrayList<>();
 
     public GraphNode getRootNode() {
         return rootNode;
@@ -57,4 +73,46 @@ public class Graph {
 
         return rootNode;
     }
+
+    public void addNewScope(){
+        List<String> scope = new ArrayList<>();
+        newVarInCurrentScope.add(scope);
+    }
+
+    public void addNewVarInCurrentScope(String varName, String graphNodeId){
+        symbolTable.computeIfAbsent(varName, v -> new ArrayList<>()).add(graphNodeId);
+        newVarInCurrentScope.get(newVarInCurrentScope.size() - 1).add(varName);
+    }
+
+    public void jumpOutOfScope(){
+        List<String> varNames = newVarInCurrentScope.get(newVarInCurrentScope.size() - 1);
+        for(String varName : varNames){
+            symbolTable.get(varName).remove(symbolTable.get(varName).size() - 1);
+        }
+        newVarInCurrentScope.remove(newVarInCurrentScope.size() - 1);
+    }
+
+    public void linkDataFlow(String currentNodeId, String varName){
+        List<String> nodesIdWithSameVarName = symbolTable.get(varName);
+        if(!currentNodeId.isEmpty() && nodesIdWithSameVarName != null){
+            String declaredNodeId = nodesIdWithSameVarName.get(nodesIdWithSameVarName.size() - 1);
+            if(!declaredNodeId.equals(currentNodeId)){
+                List<String> temp = new ArrayList<>();
+                temp.add(varName);
+                temp.add(declaredNodeId);
+                temp.add(currentNodeId);
+                dataFlowMatrix.add(temp);
+            }
+        }
+    }
+
+    public List<List<String>> getDataFlowMatrix() {
+        return dataFlowMatrix;
+    }
+
+    private String currentMethodCallNodeId = "";
+    private String currentObjCreationNodeId = "";
+
+
+
 }

@@ -1,4 +1,4 @@
-package visitorsx;
+package visitorsz;
 
 import codeanalysis.representation.Graph;
 import codeanalysis.representation.GraphNode;
@@ -16,32 +16,35 @@ import java.util.List;
 /**
  * @author coldilock
  */
-public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
+public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
+    
+    public Graph graph = new Graph();
 
     public List<String> nodeNameList = new ArrayList<>();
 
-    private String currentMethodCallNodeId = "";
-
-    private String currentObjectCreationNodeId = "";
 
     private boolean checkNodeName(String str){
         return !str.isEmpty() && !str.startsWith(".");
     }
 
+    public MethodVisitorZ(Graph graph){
+        this.graph = graph;
+    }
+
     @Override
-    public List<GraphNode> visit(MethodDeclaration n, Graph graph) {
+    public List<GraphNode> visit(MethodDeclaration n, String nodeId) {
         List<GraphNode> graphNodes = new ArrayList<>();
 
         n.getBody().ifPresent(blockStmt -> {
             graph.addNewScope();
             blockStmt.getStatements().forEach(statement -> {
-                List<GraphNode> childNodes = statement.accept(this, graph);
+                List<GraphNode> childNodes = statement.accept(this, nodeId);
                 graphNodes.addAll(childNodes);
             });
             graph.jumpOutOfScope();
         });
 
-        GraphNode rootNode = new GraphNode("Root");
+        GraphNode rootNode = new GraphNode("Root", StringUtil.getUuid());
         rootNode = graph.linkGraph(rootNode, graphNodes);
 
         List<GraphNode> graphResult = new ArrayList<>();
@@ -51,18 +54,18 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     }
 
     @Override
-    public List<GraphNode> visit(AssertStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(AssertStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(BlockStmt n, Graph graph) {
+    public List<GraphNode> visit(BlockStmt n, String nodeId) {
         System.out.println("[BLOCK]");
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        List<GraphNode> childNodes = super.visit(n, graph);
+        List<GraphNode> childNodes = super.visit(n, nodeId);
         if(childNodes != null){
             graphNodes.addAll(childNodes);
         }
@@ -71,15 +74,15 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     }
 
     @Override
-    public List<GraphNode> visit(BreakStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(BreakStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(ContinueStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(ContinueStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -87,29 +90,29 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * do while statement
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(DoStmt n, Graph graph) {
+    public List<GraphNode> visit(DoStmt n, String nodeId) {
         System.out.println("[DO WHILE]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode doWhileNode = new GraphNode("doWhile");
+        GraphNode doWhileNode = new GraphNode("doWhile", StringUtil.getUuid());
 
         // examine the condition expression and get condition node
-        GraphNode conditionNode = new GraphNode("Condition");
-        List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
+        GraphNode conditionNode = new GraphNode("Condition", StringUtil.getUuid());
+        List<GraphNode> conditionChildNodes = n.getCondition().accept(this, nodeId);
         if(conditionChildNodes != null){
             conditionNode = graph.linkGraph(conditionNode, conditionChildNodes);
             doWhileNode.addChildNode(conditionNode);
         }
 
         // examine the body and get body node
-        GraphNode bodyNode = new GraphNode("Body");
+        GraphNode bodyNode = new GraphNode("Body", StringUtil.getUuid());
         graph.addNewScope();
-        List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
+        List<GraphNode> bodyChildNodes = n.getBody().accept(this, nodeId);
         if(bodyChildNodes != null){
             bodyNode = graph.linkGraph(bodyNode, bodyChildNodes);
             doWhileNode.addChildNode(bodyNode);
@@ -122,15 +125,15 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     }
 
     @Override
-    public List<GraphNode> visit(EmptyStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(EmptyStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(ExplicitConstructorInvocationStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(ExplicitConstructorInvocationStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -138,17 +141,17 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * expression statement
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(ExpressionStmt n, Graph graph) {
+    public List<GraphNode> visit(ExpressionStmt n, String nodeId) {
 
         System.out.println("\n[EXPRESSION] " + n.getExpression().toString());
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        List<GraphNode> childNodes = super.visit(n, graph);
+        List<GraphNode> childNodes = super.visit(n, nodeId);
 
         graphNodes.addAll(CollectionUtils.emptyIfNull(childNodes));
 
@@ -158,38 +161,38 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * enchaned for statement
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(ForEachStmt n, Graph graph) {
+    public List<GraphNode> visit(ForEachStmt n, String nodeId) {
         System.out.println("[FOR EACH]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode forEachNode = new GraphNode("ForEach");
+        GraphNode forEachNode = new GraphNode("ForEach", StringUtil.getUuid());
 
         graph.addNewScope();
 
         // examine the initialization expression and get initialization node
-        GraphNode initializationNode = new GraphNode("Initialization");
-        List<GraphNode> initializationChildNodes = n.getVariable().accept(this, graph);
+        GraphNode initializationNode = new GraphNode("Initialization", StringUtil.getUuid());
+        List<GraphNode> initializationChildNodes = n.getVariable().accept(this, nodeId);
         if(initializationChildNodes != null){
             initializationNode = graph.linkGraph(initializationNode, initializationChildNodes);
             forEachNode.addChildNode(initializationNode);
         }
 
         // examine the iterable expression and get iterable node
-        GraphNode iterableNode = new GraphNode("Iterable");
-        List<GraphNode> iterableChildNodes = n.getIterable().accept(this, graph);
+        GraphNode iterableNode = new GraphNode("Iterable", StringUtil.getUuid());
+        List<GraphNode> iterableChildNodes = n.getIterable().accept(this, nodeId);
         if(iterableChildNodes != null){
             iterableNode = graph.linkGraph(iterableNode, iterableChildNodes);
             forEachNode.addChildNode(iterableNode);
         }
 
         // examine the body and get body node
-        GraphNode bodyNode = new GraphNode("Body");
-        List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
+        GraphNode bodyNode = new GraphNode("Body", StringUtil.getUuid());
+        List<GraphNode> bodyChildNodes = n.getBody().accept(this, nodeId);
         if(bodyChildNodes != null){
             bodyNode = graph.linkGraph(bodyNode, bodyChildNodes);
             forEachNode.addChildNode(bodyNode);
@@ -205,32 +208,32 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * for statement
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(ForStmt n, Graph graph) {
+    public List<GraphNode> visit(ForStmt n, String nodeId) {
         System.out.println("[FOR]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode forNode = new GraphNode("For");
+        GraphNode forNode = new GraphNode("For", StringUtil.getUuid());
 
         graph.addNewScope();
 
         // examine the initialization expression and get initialization node
-        GraphNode initializationNode = new GraphNode("Initialization");
-        List<GraphNode> initializationChildNodes = n.getInitialization().accept(this, graph);
+        GraphNode initializationNode = new GraphNode("Initialization", StringUtil.getUuid());
+        List<GraphNode> initializationChildNodes = n.getInitialization().accept(this, nodeId);
         if(initializationChildNodes != null){
             initializationNode = graph.linkGraph(initializationNode, initializationChildNodes);
             forNode.addChildNode(initializationNode);
         }
 
         // examine the compare expression and get compare node
-        GraphNode compareNode = new GraphNode("Compare");
+        GraphNode compareNode = new GraphNode("Compare", StringUtil.getUuid());
         List<GraphNode> compareChildNodes = null;
         if(n.getCompare().isPresent()){
-            compareChildNodes = n.getCompare().get().accept(this, graph);
+            compareChildNodes = n.getCompare().get().accept(this, nodeId);
         }
         if(compareChildNodes != null){
             compareNode = graph.linkGraph(compareNode, compareChildNodes);
@@ -238,16 +241,16 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         }
 
         // examine the body and get body node
-        GraphNode bodyNode = new GraphNode("Body");
-        List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
+        GraphNode bodyNode = new GraphNode("Body", StringUtil.getUuid());
+        List<GraphNode> bodyChildNodes = n.getBody().accept(this, nodeId);
         if(bodyChildNodes != null){
             bodyNode = graph.linkGraph(bodyNode, bodyChildNodes);
             forNode.addChildNode(bodyNode);
         }
 
         // examine the update expression and get update node
-        GraphNode updateNode = new GraphNode("Update");
-        List<GraphNode> updateChildNodes = n.getUpdate().accept(this, graph);
+        GraphNode updateNode = new GraphNode("Update", StringUtil.getUuid());
+        List<GraphNode> updateChildNodes = n.getUpdate().accept(this, nodeId);
         if(updateChildNodes != null){
             updateNode = graph.linkGraph(updateNode, updateChildNodes);
             forNode.addChildNode(updateNode);
@@ -263,20 +266,20 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * if statement
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(IfStmt n, Graph graph) {
+    public List<GraphNode> visit(IfStmt n, String nodeId) {
         System.out.println("[IF]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode ifNode = new GraphNode("If");
+        GraphNode ifNode = new GraphNode("If", StringUtil.getUuid());
 
         // examine the condition expression and get condition node
-        GraphNode conditionNode = new GraphNode("Condition");
-        List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
+        GraphNode conditionNode = new GraphNode("Condition", StringUtil.getUuid());
+        List<GraphNode> conditionChildNodes = n.getCondition().accept(this, nodeId);
         if(conditionChildNodes != null){
             conditionNode = graph.linkGraph(conditionNode, conditionChildNodes);
             ifNode.addChildNode(conditionNode);
@@ -285,8 +288,8 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         graph.addNewScope();
 
         // examine the then stmt and get then node
-        GraphNode thenNode = new GraphNode("Then");
-        List<GraphNode> thenChildNodes = n.getThenStmt().accept(this, graph);
+        GraphNode thenNode = new GraphNode("Then", StringUtil.getUuid());
+        List<GraphNode> thenChildNodes = n.getThenStmt().accept(this, nodeId);
         if(thenChildNodes != null){
             thenNode = graph.linkGraph(thenNode, thenChildNodes);
             ifNode.addChildNode(thenNode);
@@ -297,10 +300,10 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         graph.addNewScope();
 
         // examine the else stmt and get else node
-        GraphNode elseNode = new GraphNode("Else");
+        GraphNode elseNode = new GraphNode("Else", StringUtil.getUuid());
         List<GraphNode> elseChildNodes = null;
         if(n.getElseStmt().isPresent()){
-            elseChildNodes = n.getElseStmt().get().accept(this, graph);
+            elseChildNodes = n.getElseStmt().get().accept(this, nodeId);
         }
         if(elseChildNodes != null){
             elseNode = graph.linkGraph(elseNode, elseChildNodes);
@@ -317,8 +320,8 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
 
 
     @Override
-    public List<GraphNode> visit(LabeledStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(LabeledStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -326,21 +329,21 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * return statement
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(ReturnStmt n, Graph graph) {
+    public List<GraphNode> visit(ReturnStmt n, String nodeId) {
         System.out.println("[RETURN] " + n.toString());
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        List<GraphNode> childNodes = super.visit(n, graph);
+        List<GraphNode> childNodes = super.visit(n, nodeId);
         if(childNodes != null){
             graphNodes.addAll(childNodes);
         }
 
-        graphNodes.add(new GraphNode("Return"));
+        graphNodes.add(new GraphNode("Return", StringUtil.getUuid()));
 
         return graphNodes;
     }
@@ -348,13 +351,13 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * todo: examine switch statement
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(SwitchStmt n, Graph graph) {
+    public List<GraphNode> visit(SwitchStmt n, String nodeId) {
         System.out.println("[SWITCH] " + n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -362,12 +365,12 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * todo: examine SynchronizedStmt
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(SynchronizedStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(SynchronizedStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -375,13 +378,13 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * todo: examine ThrowStmt
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(ThrowStmt n, Graph graph) {
+    public List<GraphNode> visit(ThrowStmt n, String nodeId) {
         System.out.println("[THROW] " + n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -389,20 +392,20 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * try statement
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(TryStmt n, Graph graph) {
+    public List<GraphNode> visit(TryStmt n, String nodeId) {
         System.out.println("[TRY]");
         List<GraphNode> graphNodes = new ArrayList<>();
-        GraphNode tryNode = new GraphNode("Try");
+        GraphNode tryNode = new GraphNode("Try", StringUtil.getUuid());
 
         graph.addNewScope();
 
         // examine the try block and get try body node
-        GraphNode tryBodyNode = new GraphNode("Body");
-        List<GraphNode> tryBodyChildNodes = n.getTryBlock().accept(this, graph);
+        GraphNode tryBodyNode = new GraphNode("Body", StringUtil.getUuid());
+        List<GraphNode> tryBodyChildNodes = n.getTryBlock().accept(this, nodeId);
         if(tryBodyChildNodes != null){
             tryBodyNode = graph.linkGraph(tryBodyNode, tryBodyChildNodes);
             tryNode.addChildNode(tryBodyNode);
@@ -414,8 +417,8 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
 
         // examine the catch clauses and get catch nodes
         n.getCatchClauses().forEach(catchClause -> {
-            GraphNode catchClausesNode = new GraphNode("Catch");
-            List<GraphNode> catchClausesChildNodes = catchClause.accept(this, graph);
+            GraphNode catchClausesNode = new GraphNode("Catch", StringUtil.getUuid());
+            List<GraphNode> catchClausesChildNodes = catchClause.accept(this, nodeId);
             if(catchClausesChildNodes != null){
                 catchClausesNode = graph.linkGraph(catchClausesNode, catchClausesChildNodes);
                 tryNode.addChildNode(catchClausesNode);
@@ -427,10 +430,10 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         graph.addNewScope();
 
         // examine the try block and get try body node
-        GraphNode finallyNode = new GraphNode("Finally");
+        GraphNode finallyNode = new GraphNode("Finally", StringUtil.getUuid());
         List<GraphNode> finallyChildNodes = null;
         if(n.getFinallyBlock().isPresent()){
-            finallyChildNodes = n.getFinallyBlock().get().accept(this, graph);
+            finallyChildNodes = n.getFinallyBlock().get().accept(this, nodeId);
         }
         if(finallyChildNodes != null){
             finallyNode = graph.linkGraph(finallyNode, finallyChildNodes);
@@ -444,8 +447,8 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     }
 
     @Override
-    public List<GraphNode> visit(LocalClassDeclarationStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(LocalClassDeclarationStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -453,31 +456,31 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * while statement
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(WhileStmt n, Graph graph) {
+    public List<GraphNode> visit(WhileStmt n, String nodeId) {
 
         System.out.println("[WHILE]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode whileNode = new GraphNode("While");
+        GraphNode whileNode = new GraphNode("While", StringUtil.getUuid());
 
         graph.addNewScope();
 
         // examine the condition expression and get condition node
-        GraphNode conditionNode = new GraphNode("Condition");
-        List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
+        GraphNode conditionNode = new GraphNode("Condition", StringUtil.getUuid());
+        List<GraphNode> conditionChildNodes = n.getCondition().accept(this, nodeId);
         if(conditionChildNodes != null){
             conditionNode = graph.linkGraph(conditionNode, conditionChildNodes);
             whileNode.addChildNode(conditionNode);
         }
 
         // examine the body and get body node
-        GraphNode bodyNode = new GraphNode("Body");
-        List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
+        GraphNode bodyNode = new GraphNode("Body", StringUtil.getUuid());
+        List<GraphNode> bodyChildNodes = n.getBody().accept(this, nodeId);
         if(bodyChildNodes != null){
             bodyNode = graph.linkGraph(bodyNode, bodyChildNodes);
             whileNode.addChildNode(bodyNode);
@@ -491,15 +494,15 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     }
 
     @Override
-    public List<GraphNode> visit(UnparsableStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(UnparsableStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(YieldStmt n, Graph graph) {
-        super.visit(n, graph);
+    public List<GraphNode> visit(YieldStmt n, String nodeId) {
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -507,13 +510,13 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * todo: ArrayAccessExpr
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(ArrayAccessExpr n, Graph graph) {
+    public List<GraphNode> visit(ArrayAccessExpr n, String nodeId) {
         System.out.println("    <ArrayAccessExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -521,13 +524,13 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * todo: ArrayCreationExpr
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(ArrayCreationExpr n, Graph graph) {
+    public List<GraphNode> visit(ArrayCreationExpr n, String nodeId) {
         System.out.println("    <ArrayCreationExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -535,48 +538,78 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * todo: ArrayInitializerExpr
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(ArrayInitializerExpr n, Graph graph) {
+    public List<GraphNode> visit(ArrayInitializerExpr n, String nodeId) {
         System.out.println("    <ArrayInitializerExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     /**
-     * assign statement
+     * assign expression
      *
-     * it's necessary to get the qualified name of the Target part(the left expression of operate)  of AssignExpr
-     * we only need to get the qualified name of the Value part(the right expression of operate) of AssignExpr
-     * AssignExpr: Target operator Value
+     * AssignExpr: Target operator Value, e.g. {@code str1 = "hello world";}
+     * Target: 'str1', operator: '=', Value: "hello world"
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(AssignExpr n, Graph graph) {
+    public List<GraphNode> visit(AssignExpr n, String nodeId) {
         System.out.println("    <AssignExpr> "+ n.toString());
 
         List<GraphNode> graphNodes = new ArrayList<>();
+        /*
+         * Examine the value part of AssignExpr(i.e. the RIGHT expression of operate).
+         *
+         * AssignValueNodes may contains several nodes:
+         *      e.g. 'str1 = str1.replace(sb.toString, str2));'
+         *      two nodes: 'java.lang.StringBuffer.toString()' & 'java.lang.String.replace(java.lang.String, java.lang.String)'
+         *
+         * We use the last node's id to represent the id of the whole AssignExpr,
+         * the id will be used in data dependency process phase.
+         *      e.g. 'String str1;\n    str1 = str1.replace(sb.toString, str2));'
+         *      the data flow of str1: 'java.lang.String.Declaration' -> 'java.lang.String.replace(java.lang.String, java.lang.String)'
+         */
+        List<GraphNode> assignValueNodes = n.getValue().accept(this, nodeId);
+        String lastNodeId = "";
+        if(assignValueNodes != null && assignValueNodes.size() > 0){
+            lastNodeId = assignValueNodes.get(assignValueNodes.size() - 1).getId();
+            graphNodes.addAll(assignValueNodes);
+        }
 
-        // we only need to get the qualified name of the Value part(the right expression of operate) of AssignExpr
-        List<GraphNode> childNodes = super.visit(n, graph);
-        if(childNodes != null){
-            graphNodes.addAll(childNodes);
+        List<GraphNode> childNodes_ = n.getTarget().accept(this, lastNodeId);
+        if(childNodes_ != null){
+            graphNodes.addAll(childNodes_);
         }
 
         return graphNodes;
     }
+//    @Override
+//    public List<GraphNode> visit(AssignExpr n, String nodeId) {
+//        System.out.println("    <AssignExpr> "+ n.toString());
+//
+//        List<GraphNode> graphNodes = new ArrayList<>();
+//
+//        // we only need to get the qualified name of the Value part(the right expression of operate) of AssignExpr
+//        List<GraphNode> childNodes = super.visit(n, nodeId);
+//        if(childNodes != null){
+//            graphNodes.addAll(childNodes);
+//        }
+//
+//        return graphNodes;
+//    }
 
     @Override
-    public List<GraphNode> visit(BinaryExpr n, Graph graph) {
+    public List<GraphNode> visit(BinaryExpr n, String nodeId) {
         System.out.println("    <BinaryExpr> "+ n.toString());
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        List<GraphNode> childeNodes = super.visit(n, graph);
+        List<GraphNode> childeNodes = super.visit(n, nodeId);
         if(childeNodes != null){
             graphNodes.addAll(childeNodes);
         }
@@ -585,60 +618,60 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     }
 
     @Override
-    public List<GraphNode> visit(BooleanLiteralExpr n, Graph graph) {
+    public List<GraphNode> visit(BooleanLiteralExpr n, String nodeId) {
         System.out.println("    <BooleanLiteralExpr> "+ n.toString());
         // System.out.println("        $ .Constant");
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(CastExpr n, Graph graph) {
+    public List<GraphNode> visit(CastExpr n, String nodeId) {
         System.out.println("    <CastExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(CharLiteralExpr n, Graph graph) {
+    public List<GraphNode> visit(CharLiteralExpr n, String nodeId) {
         System.out.println("    <CharLiteralExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(ClassExpr n, Graph graph) {
+    public List<GraphNode> visit(ClassExpr n, String nodeId) {
         System.out.println("    <ClassExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(ConditionalExpr n, Graph graph) {
+    public List<GraphNode> visit(ConditionalExpr n, String nodeId) {
         System.out.println("    <ConditionalExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(DoubleLiteralExpr n, Graph graph) {
+    public List<GraphNode> visit(DoubleLiteralExpr n, String nodeId) {
         System.out.println("    <DoubleLiteralExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(EnclosedExpr n, Graph graph) {
+    public List<GraphNode> visit(EnclosedExpr n, String nodeId) {
         System.out.println("    <EnclosedExpr> "+ n.toString());
 
         List<GraphNode> graphNodes = new ArrayList<>();
-        List<GraphNode> childNodes = super.visit(n, graph);
+        List<GraphNode> childNodes = super.visit(n, nodeId);
         if(childNodes != null){
             graphNodes.addAll(childNodes);
         }
@@ -647,93 +680,51 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     }
 
     @Override
-    public List<GraphNode> visit(FieldAccessExpr n, Graph graph) {
+    public List<GraphNode> visit(FieldAccessExpr n, String nodeId) {
         System.out.println("    <FieldAccessExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(InstanceOfExpr n, Graph graph) {
+    public List<GraphNode> visit(InstanceOfExpr n, String nodeId) {
         System.out.println("    <InstanceOfExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(IntegerLiteralExpr n, Graph graph) {
+    public List<GraphNode> visit(IntegerLiteralExpr n, String nodeId) {
         List<GraphNode> graphNodes = new ArrayList<>();
         System.out.println("    <IntegerLiteralExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(LongLiteralExpr n, Graph graph) {
+    public List<GraphNode> visit(LongLiteralExpr n, String nodeId) {
         System.out.println("    <LongLiteralExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
 
     }
+
 
     /**
      * method call expression
      * @param n
-     * @param graph
+     * @param nodeId id of MethodCallExpr's parent node
      * @return
      */
-//    @Override
-//    public List<GraphNode> visit(MethodCallExpr n, Graph graph) {
-//
-//        List<GraphNode> graphNodes = new ArrayList<>();
-//
-//        String nodeId = StringUtil.getUuid();
-//        currentNodeId = nodeId;
-//
-//        /*
-//         * examine the method call inside the parameter list of the current method call expression at first
-//         *
-//         * obj.method1().method2()
-//         * output: method1() -> method2()
-//         *
-//         * obj.method1(method2())
-//         * output: method2() -> method1()
-//         */
-//        List<GraphNode> childNodes = super.visit(n, graph);
-//        if(childNodes != null){
-//            graphNodes.addAll(childNodes);
-//        }
-//
-//        System.out.println("    <MethodCallExpr> "+ n.toString());
-//
-//        StringBuilder currentNodeName = new StringBuilder();
-//        String methodSignature;
-//        try{
-//            methodSignature = n.resolve().getQualifiedSignature();
-//        } catch (UnsolvedSymbolException e){
-//            methodSignature = "UnsolvedType.unsolvedMethod()";
-//        }
-//        currentNodeName.append(methodSignature);
-//
-//
-//        if(checkNodeName(currentNodeName.toString())){
-//            nodeNameList.add(currentNodeName.toString());
-//            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "MethodCall", n.toString(), nodeId));
-//        }
-//
-//        return graphNodes;
-//    }
-
-        @Override
-    public List<GraphNode> visit(MethodCallExpr n, Graph graph) {
+    @Override
+    public List<GraphNode> visit(MethodCallExpr n, String nodeId) {
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        String nodeId = StringUtil.getUuid();
-        currentMethodCallNodeId = nodeId;
+        String currentNodeId = StringUtil.getUuid();
 
         /*
          * examine the method call inside the parameter list of the current method call expression at first
@@ -744,7 +735,8 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
          * obj.method1(method2())
          * output: method2() -> method1()
          */
-        List<GraphNode> childNodes = super.visit(n, graph);
+        // todo: pass currentNodeId to n.getArguments, pass nodeId to n.getScope
+        List<GraphNode> childNodes = super.visit(n, currentNodeId);
         if(childNodes != null){
             graphNodes.addAll(childNodes);
         }
@@ -763,33 +755,27 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
 
         if(checkNodeName(currentNodeName.toString())){
             nodeNameList.add(currentNodeName.toString());
-            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "MethodCall", n.toString(), nodeId));
+            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "MethodCall", n.toString(), currentNodeId));
         }
 
         return graphNodes;
     }
 
     /**
-     * 处理数据流的关键
+     * key of data dependency
      * @param n®
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(NameExpr n, Graph graph) {
+    public List<GraphNode> visit(NameExpr n, String nodeId) {
         List<GraphNode> graphNodes = new ArrayList<>();
 
         System.out.println("Name: "+n.toString());
 
-        n.getParentNode().ifPresent(parentNode->{
-            if(((Expression)parentNode).isMethodCallExpr()){
-                graph.linkDataFlow(currentMethodCallNodeId, n.getNameAsString());
-            } else if (((Expression)parentNode).isObjectCreationExpr()){
-                graph.linkDataFlow(currentObjectCreationNodeId, n.getNameAsString());
-            }
-        });
+        graph.linkDataFlow(nodeId, n.getNameAsString());
 
-        List<GraphNode> childNodes = super.visit(n, graph);
+        List<GraphNode> childNodes = super.visit(n, nodeId);
         if(childNodes != null)
             graphNodes.addAll(childNodes);
 
@@ -797,17 +783,17 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     }
 
     @Override
-    public List<GraphNode> visit(NormalAnnotationExpr n, Graph graph) {
+    public List<GraphNode> visit(NormalAnnotationExpr n, String nodeId) {
         System.out.println("    <NormalAnnotationExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(NullLiteralExpr n, Graph graph) {
+    public List<GraphNode> visit(NullLiteralExpr n, String nodeId) {
         System.out.println("    <NullLiteralExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -815,18 +801,18 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * object creation expression
      * @param n
-     * @param graph
+     * @param nodeId id of ObjectCreationExpr's parent node
      * @return
      */
     @Override
-    public List<GraphNode> visit(ObjectCreationExpr n, Graph graph) {
+    public List<GraphNode> visit(ObjectCreationExpr n, String nodeId) {
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        String nodeId = StringUtil.getUuid();
-        currentObjectCreationNodeId = nodeId;
+        String currentNodeId = StringUtil.getUuid();
 
         // Examine the method call inside the constructor at first
-        List<GraphNode> childNodes = super.visit(n, graph);
+        // todo: pass currentNodeId to n.getArguments, pass nodeId to n.getScope
+        List<GraphNode> childNodes = super.visit(n, currentNodeId);
         if(childNodes != null)
             graphNodes.addAll(childNodes);
 
@@ -845,46 +831,46 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         if(n.getParentNode().isPresent()){
             String originalStmt = n.getParentNode().get().toString();
             String varIdentifier = ((VariableDeclarator) n.getParentNode().get()).getNameAsString();
-            graphNodes.add(new GraphNode(currentNodeName.toString(), varIdentifier, "ObjCreation", originalStmt, nodeId));
+            graphNodes.add(new GraphNode(currentNodeName.toString(), varIdentifier, "ObjCreation", originalStmt, currentNodeId));
 
         } else {
             // e.g. 'new File();'
-            graphNodes.add(new GraphNode(currentNodeName.toString(), "unknown", "ObjCreation", n.toString(), nodeId));
+            graphNodes.add(new GraphNode(currentNodeName.toString(), "unknown", "ObjCreation", n.toString(), currentNodeId));
         }
 
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(SingleMemberAnnotationExpr n, Graph graph) {
+    public List<GraphNode> visit(SingleMemberAnnotationExpr n, String nodeId) {
         System.out.println("    <SingleMemberAnnotationExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(StringLiteralExpr n, Graph graph) {
+    public List<GraphNode> visit(StringLiteralExpr n, String nodeId) {
         System.out.println("    <StringLiteralExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(SuperExpr n, Graph graph) {
+    public List<GraphNode> visit(SuperExpr n, String nodeId) {
         System.out.println("    <SuperExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(UnaryExpr n, Graph graph) {
+    public List<GraphNode> visit(UnaryExpr n, String nodeId) {
         System.out.println("    <UnaryExpr> "+ n.toString());
 
         List<GraphNode> graphNodes = new ArrayList<>();
-        List<GraphNode> childNodes = super.visit(n, graph);
+        List<GraphNode> childNodes = super.visit(n, nodeId);
         if(childNodes != null){
             graphNodes.addAll(childNodes);
         }
@@ -893,9 +879,9 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     }
 
     @Override
-    public List<GraphNode> visit(ThisExpr n, Graph graph) {
+    public List<GraphNode> visit(ThisExpr n, String nodeId) {
         System.out.println("    <ThisExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -903,55 +889,55 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * variable declaration expression
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(VariableDeclarationExpr n, Graph graph) {
+    public List<GraphNode> visit(VariableDeclarationExpr n, String nodeId) {
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        List<GraphNode> childNodes = super.visit(n, graph);
+        List<GraphNode> childNodes = super.visit(n, nodeId);
 
         graphNodes.addAll(CollectionUtils.emptyIfNull(childNodes));
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(LambdaExpr n, Graph graph) {
+    public List<GraphNode> visit(LambdaExpr n, String nodeId) {
         System.out.println("    <LambdaExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(MethodReferenceExpr n, Graph graph) {
+    public List<GraphNode> visit(MethodReferenceExpr n, String nodeId) {
         System.out.println("    <MethodReferenceExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(TypeExpr n, Graph graph) {
+    public List<GraphNode> visit(TypeExpr n, String nodeId) {
         System.out.println("    <TypeExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(SwitchExpr n, Graph graph) {
+    public List<GraphNode> visit(SwitchExpr n, String nodeId) {
         System.out.println("    <SwitchExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
     @Override
-    public List<GraphNode> visit(TextBlockLiteralExpr n, Graph graph) {
+    public List<GraphNode> visit(TextBlockLiteralExpr n, String nodeId) {
         System.out.println("    <TextBlockLiteralExpr> "+ n.toString());
-        super.visit(n, graph);
+        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
@@ -959,17 +945,17 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * variable declarator
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(VariableDeclarator n, Graph graph) {
+    public List<GraphNode> visit(VariableDeclarator n, String nodeId) {
         List<GraphNode> graphNodes = new ArrayList<>();
 
         // This id will only be used when the Initializer is LiteralExpr
-        String nodeId = StringUtil.getUuid();
+        String currentNodeId = StringUtil.getUuid();
 
-        List<GraphNode> childNodes = super.visit(n, graph);
+        List<GraphNode> childNodes = super.visit(n, nodeId);
         graphNodes.addAll(CollectionUtils.emptyIfNull(childNodes));
 
         StringBuilder currentNodeName = new StringBuilder();
@@ -988,9 +974,9 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
          */
         if(!n.getInitializer().isPresent()){
             currentNodeName.append(".").append("Declaration");
-            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), nodeId));
+            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), currentNodeId));
             nodeNameList.add(currentNodeName.toString());
-            graph.addNewVarInCurrentScope(n.getNameAsString(), nodeId);
+            graph.addNewVarInCurrentScope(n.getNameAsString(), currentNodeId);
         }
 
         /*
@@ -1003,21 +989,21 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         n.getInitializer().ifPresent(init -> {
             if(init.isLiteralExpr() && !init.isNullLiteralExpr() && !init.isTextBlockLiteralExpr()){
                 currentNodeName.append(".").append("Constant");
-                graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), nodeId));
+                graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), currentNodeId));
                 nodeNameList.add(currentNodeName.toString());
-                graph.addNewVarInCurrentScope(n.getNameAsString(), nodeId);
+                graph.addNewVarInCurrentScope(n.getNameAsString(), currentNodeId);
             } else if(init.isNullLiteralExpr()){
                 currentNodeName.append(".").append("Declaration").append(".").append("NULL");
-                graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), nodeId));
+                graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), currentNodeId));
                 nodeNameList.add(currentNodeName.toString());
-                graph.addNewVarInCurrentScope(n.getNameAsString(), nodeId);
-            } else if(init.isMethodCallExpr() || init.isObjectCreationExpr()){
+                graph.addNewVarInCurrentScope(n.getNameAsString(), currentNodeId);
+            } else if((init.isMethodCallExpr() || init.isObjectCreationExpr()) && childNodes.size() > 0){
                 /*
                  * Record variable name to SYMBOLTABLE.
                  *
                  * when the initializer is a METHODCALL / OBJECTCREATION Expr,
                  * the corresponding node has already been created and added into the childNodes list (the LAST node).
-                 * So get the node id and add the (varName, nodeId) pair to SYMBOLTABLE (used for data dependency)
+                 * So get the node id and add the (varName, nodeId) pair to SYMBOLTABLE (used for data dependency phase)
                  */
                 String lastNodeId = childNodes.get(childNodes.size() - 1).getId();
                 graph.addNewVarInCurrentScope(n.getNameAsString(), lastNodeId);
@@ -1030,16 +1016,16 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
     /**
      * catch clause
      * @param n
-     * @param graph
+     * @param nodeId
      * @return
      */
     @Override
-    public List<GraphNode> visit(CatchClause n, Graph graph) {
+    public List<GraphNode> visit(CatchClause n, String nodeId) {
         System.out.println("[CATCH]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        List<GraphNode> childNodes = super.visit(n, graph);
+        List<GraphNode> childNodes = super.visit(n, nodeId);
         if(childNodes != null){
             graphNodes.addAll(childNodes);
         }

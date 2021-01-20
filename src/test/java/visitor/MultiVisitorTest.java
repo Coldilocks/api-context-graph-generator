@@ -20,6 +20,8 @@ import visitors2.MethodCompleteVisitor;
 import visitors2.MethodStmtVisitor;
 import visitors3.MethodGenericVisitor;
 import visitorsx.MethodVisitorX;
+import visitorsz.MethodVisitorZ;
+//import visitorsx.MethodVisitorX;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -57,7 +59,10 @@ public class MultiVisitorTest {
         // getJdkAndCustomType();
 
         // using MethodGenericVisitor
-        getControlFlow();
+//        getControlFlow();
+
+        // using MethodGenericVisitorZ
+        getControlFlowZ();
 
         // pre order the tree
         // preOrder();
@@ -212,7 +217,49 @@ public class MultiVisitorTest {
      * get the control flow graph for a method
      * @throws IOException
      */
-    public static void getControlFlow() throws IOException {
+//    public static void getControlFlow() throws IOException {
+//
+//        String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
+//
+//        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
+//        typeSolver.add(new ReflectionTypeSolver());
+//        typeSolver.add(JarTypeSolver.getJarTypeSolver(jarFile));
+//
+//        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
+//        StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
+//
+//        CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
+//
+//        cu.getTypes().forEach(type ->
+//                type.getMethods().forEach(method -> {
+//                    System.out.println("\n<<<<<<<< 1.Visiting >>>>>>>>\n");
+//                    Graph graph = new Graph();
+//
+//                    MethodVisitorX visitor = new MethodVisitorX();
+//                    // get graph node of current method, graphNodes list only have one element, i.e. root node.
+//                    List<GraphNode> graphNodes = method.accept(visitor, graph);
+//
+//                    System.out.println("\n<<<<<<<< 2.Nodes in List >>>>>>>>\n");
+//
+//                    visitor.nodeNameList.forEach(System.out::println);
+//
+//                    System.out.println("\n<<<<<<<< 3.Nodes in Tree >>>>>>>>\n");
+//
+//                    GraphNode rootNode = graphNodes.get(0);
+//                    rootNode.traversalTree(rootNode);
+//
+//                    System.out.println("\n<<<<<<<< 4.Data dependency >>>>>>>>\n");
+//
+//                    graph.getDataFlowMatrix().forEach(System.out::println);
+//
+//
+//                }));
+//
+//
+//
+//    }
+
+    public static void getControlFlowZ() throws IOException {
 
         String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
 
@@ -227,18 +274,26 @@ public class MultiVisitorTest {
 
         cu.getTypes().forEach(type ->
                 type.getMethods().forEach(method -> {
-                    System.out.println("<<<<<<<< START >>>>>>>>");
+                    System.out.println("\n<<<<<<<< 1.Visiting >>>>>>>>\n");
                     Graph graph = new Graph();
 
-                    MethodVisitorX visitor = new MethodVisitorX();
-                    // graphNodes is the final result
-                    List<GraphNode> graphNodes = method.accept(visitor, graph);
+                    MethodVisitorZ visitor = new MethodVisitorZ(graph);
+                    // get graph node of current method, graphNodes list only have one element, i.e. root node.
+                    List<GraphNode> graphNodes = method.accept(visitor, "");
 
-                    System.out.println("<<<<<<<< END >>>>>>>>");
-
-                    System.out.println();
+                    System.out.println("\n<<<<<<<< 2.Nodes in List >>>>>>>>\n");
 
                     visitor.nodeNameList.forEach(System.out::println);
+
+                    System.out.println("\n<<<<<<<< 3.Nodes in Tree >>>>>>>>\n");
+
+                    GraphNode rootNode = graphNodes.get(0);
+                    rootNode.traversalTree(rootNode);
+
+                    System.out.println("\n<<<<<<<< 4.Data dependency >>>>>>>>\n");
+
+                    graph.getDataFlowMatrix().forEach(System.out::println);
+
 
                 }));
 

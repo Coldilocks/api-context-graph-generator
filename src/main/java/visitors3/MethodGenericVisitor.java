@@ -7,6 +7,7 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
+import util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,10 +87,10 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode doWhileNode = new GraphNode("doWhile");
+        GraphNode doWhileNode = new GraphNode("doWhile", StringUtil.getUuid());
 
         // examine the condition expression and get condition node
-        GraphNode conditionNode = new GraphNode("Condition");
+        GraphNode conditionNode = new GraphNode("Condition", StringUtil.getUuid());
         List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
         if(conditionChildNodes != null){
             for(GraphNode tempNode : conditionChildNodes){
@@ -99,7 +100,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
         }
 
         // examine the body and get body node
-        GraphNode bodyNode = new GraphNode("Body");
+        GraphNode bodyNode = new GraphNode("Body", StringUtil.getUuid());
         List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
         if(bodyChildNodes != null){
             for(GraphNode tempNode : bodyChildNodes){
@@ -180,10 +181,10 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode ifNode = new GraphNode("If");
+        GraphNode ifNode = new GraphNode("If", StringUtil.getUuid());
 
         // examine the condition expression and get condition node
-        GraphNode conditionNode = new GraphNode("Condition");
+        GraphNode conditionNode = new GraphNode("Condition", StringUtil.getUuid());
         List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
         if(conditionChildNodes != null){
             for(GraphNode tempNode : conditionChildNodes){
@@ -193,7 +194,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
         }
 
         // examine the then stmt and get then node
-        GraphNode thenNode = new GraphNode("Then");
+        GraphNode thenNode = new GraphNode("Then", StringUtil.getUuid());
         List<GraphNode> thenChildNodes = n.getThenStmt().accept(this, graph);
         if(thenChildNodes != null){
             for(GraphNode tempNode : thenChildNodes){
@@ -203,7 +204,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
         }
 
         // examine the else stmt and get else node
-        GraphNode elseNode = new GraphNode("Else");
+        GraphNode elseNode = new GraphNode("Else", StringUtil.getUuid());
         List<GraphNode> elseChildNodes = null;
         if(n.getElseStmt().isPresent()){
             elseChildNodes = n.getElseStmt().get().accept(this, graph);
@@ -239,7 +240,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
         if(childNodes != null)
             graphNodes.addAll(childNodes);
 
-        graphNodes.add(new GraphNode("Return"));
+        graphNodes.add(new GraphNode("Return", StringUtil.getUuid()));
 
         return graphNodes;
     }
@@ -270,10 +271,10 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
     public List<GraphNode> visit(TryStmt n, Graph graph) {
         System.out.println("[TRY]");
         List<GraphNode> graphNodes = new ArrayList<>();
-        GraphNode tryNode = new GraphNode("Try");
+        GraphNode tryNode = new GraphNode("Try", StringUtil.getUuid());
 
         // examine the try block and get try body node
-        GraphNode tryBodyNode = new GraphNode("Body");
+        GraphNode tryBodyNode = new GraphNode("Body", StringUtil.getUuid());
         List<GraphNode> tryBodyChildNodes = n.getTryBlock().accept(this, graph);
         if(tryBodyChildNodes != null){
             for(GraphNode tempNode : tryBodyChildNodes){
@@ -284,7 +285,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
         // examine the catch clauses and get catch nodes
         n.getCatchClauses().forEach(catchClause -> {
-            GraphNode catchClausesNode = new GraphNode("Catch");
+            GraphNode catchClausesNode = new GraphNode("Catch", StringUtil.getUuid());
             List<GraphNode> catchClausesChildNodes = catchClause.accept(this, graph);
             if(catchClausesChildNodes != null){
                 for(GraphNode tempNode : catchClausesChildNodes){
@@ -295,7 +296,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
         });
 
         // examine the try block and get try body node
-        GraphNode finallyNode = new GraphNode("Finally");
+        GraphNode finallyNode = new GraphNode("Finally", StringUtil.getUuid());
         List<GraphNode> finallyChildNodes = null;
         if(n.getFinallyBlock().isPresent()){
             finallyChildNodes = n.getFinallyBlock().get().accept(this, graph);
@@ -322,7 +323,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
     public List<GraphNode> visit(WhileStmt n, Graph graph) {
         System.out.println("[WHILE]");
         List<GraphNode> graphNodes = new ArrayList<>();
-        GraphNode currentNode = new GraphNode("While");
+        GraphNode currentNode = new GraphNode("While", StringUtil.getUuid());
 
         List<GraphNode> childNodes = super.visit(n, graph);
         if(childNodes != null){
@@ -394,7 +395,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
         if(checkNodeName()){
             nodeNameList.add(nodeName.toString());
-            graphNodes.add(new GraphNode(nodeName.toString()));
+            graphNodes.add(new GraphNode(nodeName.toString(), StringUtil.getUuid()));
         }
         return graphNodes;
     }
@@ -559,7 +560,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
         // System.out.println(nodeName);
         if(checkNodeName()){
             nodeNameList.add(nodeName.toString());
-            graphNodes.add(new GraphNode(nodeName.toString()));
+            graphNodes.add(new GraphNode(nodeName.toString(), StringUtil.getUuid()));
         }
 
         nodeName = new StringBuilder();
@@ -640,7 +641,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
             nodeName.append(".new").append("(").append(objCreationName, objCreationName.indexOf("(") + 1, objCreationName.indexOf(")") + 1 );
             if(checkNodeName()){
                 nodeNameList.add(nodeName.toString());
-                graphNodes.add(new GraphNode(nodeName.toString()));
+                graphNodes.add(new GraphNode(nodeName.toString(), StringUtil.getUuid()));
             }
             nodeName = new StringBuilder();
         } catch (UnsolvedSymbolException e){
@@ -648,7 +649,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
             // System.out.println("        % can't resolve the type of " + n.toString());
             if(checkNodeName()){
                 nodeNameList.add("UnresolvableType");
-                graphNodes.add(new GraphNode("UnresolvableType"));
+                graphNodes.add(new GraphNode("UnresolvableType", StringUtil.getUuid()));
             }
             nodeName = new StringBuilder();
         }
@@ -803,7 +804,7 @@ public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Gr
 
         if(checkNodeName()){
             nodeNameList.add(nodeName.toString());
-            graphNodes.add(new GraphNode(nodeName.toString()));
+            graphNodes.add(new GraphNode(nodeName.toString(), StringUtil.getUuid()));
         }
         return graphNodes;
     }

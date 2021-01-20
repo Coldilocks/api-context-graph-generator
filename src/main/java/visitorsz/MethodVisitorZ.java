@@ -62,7 +62,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(BlockStmt n, String nodeId) {
-        System.out.println("[BLOCK]");
         List<GraphNode> graphNodes = new ArrayList<>();
 
         List<GraphNode> childNodes = super.visit(n, nodeId);
@@ -95,7 +94,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(DoStmt n, String nodeId) {
-        System.out.println("[DO WHILE]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
@@ -147,8 +145,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
     @Override
     public List<GraphNode> visit(ExpressionStmt n, String nodeId) {
 
-        System.out.println("\n[EXPRESSION] " + n.getExpression().toString());
-
         List<GraphNode> graphNodes = new ArrayList<>();
 
         List<GraphNode> childNodes = super.visit(n, nodeId);
@@ -166,7 +162,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(ForEachStmt n, String nodeId) {
-        System.out.println("[FOR EACH]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
@@ -213,7 +208,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(ForStmt n, String nodeId) {
-        System.out.println("[FOR]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
@@ -271,7 +265,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(IfStmt n, String nodeId) {
-        System.out.println("[IF]");
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
@@ -334,7 +327,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(ReturnStmt n, String nodeId) {
-        System.out.println("[RETURN] " + n.toString());
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
@@ -356,7 +348,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(SwitchStmt n, String nodeId) {
-        System.out.println("[SWITCH] " + n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -383,7 +374,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(ThrowStmt n, String nodeId) {
-        System.out.println("[THROW] " + n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -397,7 +387,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(TryStmt n, String nodeId) {
-        System.out.println("[TRY]");
         List<GraphNode> graphNodes = new ArrayList<>();
         GraphNode tryNode = new GraphNode("Try", StringUtil.getUuid());
 
@@ -462,8 +451,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
     @Override
     public List<GraphNode> visit(WhileStmt n, String nodeId) {
 
-        System.out.println("[WHILE]");
-
         List<GraphNode> graphNodes = new ArrayList<>();
 
         GraphNode whileNode = new GraphNode("While", StringUtil.getUuid());
@@ -515,7 +502,7 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(ArrayAccessExpr n, String nodeId) {
-        System.out.println("    <ArrayAccessExpr> "+ n.toString());
+
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -529,7 +516,7 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(ArrayCreationExpr n, String nodeId) {
-        System.out.println("    <ArrayCreationExpr> "+ n.toString());
+
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -543,7 +530,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(ArrayInitializerExpr n, String nodeId) {
-        System.out.println("    <ArrayInitializerExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -560,7 +546,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(AssignExpr n, String nodeId) {
-        System.out.println("    <AssignExpr> "+ n.toString());
 
         List<GraphNode> graphNodes = new ArrayList<>();
         /*
@@ -589,24 +574,9 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
         return graphNodes;
     }
-//    @Override
-//    public List<GraphNode> visit(AssignExpr n, String nodeId) {
-//        System.out.println("    <AssignExpr> "+ n.toString());
-//
-//        List<GraphNode> graphNodes = new ArrayList<>();
-//
-//        // we only need to get the qualified name of the Value part(the right expression of operate) of AssignExpr
-//        List<GraphNode> childNodes = super.visit(n, nodeId);
-//        if(childNodes != null){
-//            graphNodes.addAll(childNodes);
-//        }
-//
-//        return graphNodes;
-//    }
 
     @Override
     public List<GraphNode> visit(BinaryExpr n, String nodeId) {
-        System.out.println("    <BinaryExpr> "+ n.toString());
         List<GraphNode> graphNodes = new ArrayList<>();
 
         List<GraphNode> childeNodes = super.visit(n, nodeId);
@@ -619,8 +589,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(BooleanLiteralExpr n, String nodeId) {
-        System.out.println("    <BooleanLiteralExpr> "+ n.toString());
-        // System.out.println("        $ .Constant");
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -628,7 +596,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(CastExpr n, String nodeId) {
-        System.out.println("    <CastExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -636,7 +603,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(CharLiteralExpr n, String nodeId) {
-        System.out.println("    <CharLiteralExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -644,7 +610,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(ClassExpr n, String nodeId) {
-        System.out.println("    <ClassExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -652,7 +617,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(ConditionalExpr n, String nodeId) {
-        System.out.println("    <ConditionalExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -660,7 +624,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(DoubleLiteralExpr n, String nodeId) {
-        System.out.println("    <DoubleLiteralExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -668,8 +631,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(EnclosedExpr n, String nodeId) {
-        System.out.println("    <EnclosedExpr> "+ n.toString());
-
         List<GraphNode> graphNodes = new ArrayList<>();
         List<GraphNode> childNodes = super.visit(n, nodeId);
         if(childNodes != null){
@@ -681,7 +642,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(FieldAccessExpr n, String nodeId) {
-        System.out.println("    <FieldAccessExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -689,7 +649,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(InstanceOfExpr n, String nodeId) {
-        System.out.println("    <InstanceOfExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -698,18 +657,15 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
     @Override
     public List<GraphNode> visit(IntegerLiteralExpr n, String nodeId) {
         List<GraphNode> graphNodes = new ArrayList<>();
-        System.out.println("    <IntegerLiteralExpr> "+ n.toString());
         super.visit(n, nodeId);
         return graphNodes;
     }
 
     @Override
     public List<GraphNode> visit(LongLiteralExpr n, String nodeId) {
-        System.out.println("    <LongLiteralExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
-
     }
 
 
@@ -741,8 +697,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
             graphNodes.addAll(childNodes);
         }
 
-        System.out.println("    <MethodCallExpr> "+ n.toString());
-
         StringBuilder currentNodeName = new StringBuilder();
         String methodSignature;
         try{
@@ -771,8 +725,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
     public List<GraphNode> visit(NameExpr n, String nodeId) {
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        System.out.println("Name: "+n.toString());
-
         graph.linkDataFlow(nodeId, n.getNameAsString());
 
         List<GraphNode> childNodes = super.visit(n, nodeId);
@@ -784,7 +736,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(NormalAnnotationExpr n, String nodeId) {
-        System.out.println("    <NormalAnnotationExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -792,7 +743,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(NullLiteralExpr n, String nodeId) {
-        System.out.println("    <NullLiteralExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -843,7 +793,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(SingleMemberAnnotationExpr n, String nodeId) {
-        System.out.println("    <SingleMemberAnnotationExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -851,7 +800,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(StringLiteralExpr n, String nodeId) {
-        System.out.println("    <StringLiteralExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -859,7 +807,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(SuperExpr n, String nodeId) {
-        System.out.println("    <SuperExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -867,7 +814,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(UnaryExpr n, String nodeId) {
-        System.out.println("    <UnaryExpr> "+ n.toString());
 
         List<GraphNode> graphNodes = new ArrayList<>();
         List<GraphNode> childNodes = super.visit(n, nodeId);
@@ -880,7 +826,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(ThisExpr n, String nodeId) {
-        System.out.println("    <ThisExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -904,7 +849,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(LambdaExpr n, String nodeId) {
-        System.out.println("    <LambdaExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -912,7 +856,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(MethodReferenceExpr n, String nodeId) {
-        System.out.println("    <MethodReferenceExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -920,7 +863,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(TypeExpr n, String nodeId) {
-        System.out.println("    <TypeExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -928,7 +870,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(SwitchExpr n, String nodeId) {
-        System.out.println("    <SwitchExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -936,7 +877,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(TextBlockLiteralExpr n, String nodeId) {
-        System.out.println("    <TextBlockLiteralExpr> "+ n.toString());
         super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
@@ -1021,8 +961,6 @@ public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
      */
     @Override
     public List<GraphNode> visit(CatchClause n, String nodeId) {
-        System.out.println("[CATCH]");
-
         List<GraphNode> graphNodes = new ArrayList<>();
 
         List<GraphNode> childNodes = super.visit(n, nodeId);

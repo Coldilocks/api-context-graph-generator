@@ -17,8 +17,9 @@ import java.util.List;
  * @author coldilock
  */
 public class MethodVisitorZ extends GenericVisitorAdapterZ<GraphNode, String> {
-    
-    public Graph graph = new Graph();
+
+    /** A util to create graph */
+    public Graph graph;
 
     public List<String> nodeNameList = new ArrayList<>();
 

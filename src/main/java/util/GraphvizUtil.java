@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author coldilock
@@ -39,15 +40,15 @@ public class GraphvizUtil {
     }
 
     /**
-     * Create a graph
+     * Create a graph, different edge type has different color
      * @param graphNodeList all the nodes in the graph
      * @param edgeMap all the edges classified by c(control only), d(data only), cd(control and data only)
      * @throws IOException
      */
-    public static void createGraph(String filePath, List<GraphNode> graphNodeList, Map<String, List<Pair<String, String>>> edgeMap) throws IOException {
+    public static void createGraphWithColor(String filePath, List<GraphNode> graphNodeList, Map<String, List<Pair<String, String>>> edgeMap) throws IOException {
         PrintWriter out = new PrintWriter(filePath);
 
-        StringBuilder result = new StringBuilder();
+        StringBuilder finalResult = new StringBuilder();
 
         String header = "digraph callGraph {\n\tnode [shape=rectangle]\n";
 
@@ -73,13 +74,16 @@ public class GraphvizUtil {
 
         StringBuilder dEdgesInResult = new StringBuilder();
         for(Pair<String, String> edge : edgeMap.get("d")){
+            // [color=red, style=dashed]
             dEdgesInResult.append("\t")
                     .append(edge.a)
                     .append(" -> ")
                     .append(edge.b)
                     .append("[label=\"")
                     .append("d")
-                    .append("\"]\n");
+                    .append("\", ")
+                    .append("color=red, style=dashed")
+                    .append("]\n");
         }
 
         StringBuilder cdEdgesInResult = new StringBuilder();
@@ -90,12 +94,66 @@ public class GraphvizUtil {
                     .append(edge.b)
                     .append("[label=\"")
                     .append("cd")
-                    .append("\"]\n");
+                    .append("\", ")
+                    .append("color=blue")
+                    .append("]\n");
         }
 
-        result.append(header).append(nodesInResult).append(cEdgesInResult).append(dEdgesInResult).append(cdEdgesInResult).append("}");
+        finalResult.append(header).append(nodesInResult).append(cEdgesInResult).append(dEdgesInResult).append(cdEdgesInResult).append("}");
 
-        out.print(result);
+//        finalResult.append(header).append(nodesInResult).append(edgesInResult).append("}");
+
+
+        out.print(finalResult);
+        out.flush();
+        out.close();
+    }
+
+    /**
+     * Create a graph
+     * @param graphNodeList all the nodes in the graph
+     * @param edgeMap all the edges classified by c(control only), d(data only), cd(control and data only)
+     * @throws IOException
+     */
+    @Deprecated
+    public static void createGraph(String filePath, List<GraphNode> graphNodeList, Map<String, List<Pair<String, String>>> edgeMap) throws IOException {
+        PrintWriter out = new PrintWriter(filePath);
+
+        StringBuilder finalResult = new StringBuilder();
+
+        String header = "digraph callGraph {\n\tnode [shape=rectangle]\n";
+
+        StringBuilder nodesInResult = new StringBuilder();
+        graphNodeList.forEach(graphNode ->
+                nodesInResult.append("\t")
+                        .append(graphNode.getId())
+                        .append("  [label=\"")
+                        .append(graphNode.getNodeName().replace("\"", "\\\""))
+                        .append("\"]\n")
+        );
+
+
+        StringBuilder edgesInResult = new StringBuilder();
+
+        edgeMap.keySet().forEach(
+                type -> edgeMap.get(type).forEach(
+                        edge -> edgesInResult.append("\t")
+                                .append(edge.a)
+                                .append(" -> ")
+                                .append(edge.b)
+                                .append("[label=\"")
+                                .append(type)
+                                .append("\"]\n")
+                )
+
+        );
+
+        finalResult.append(header)
+                .append(nodesInResult)
+                .append(edgesInResult)
+                .append("}");
+
+        out.print(finalResult);
         out.flush();
         out.close();
     }

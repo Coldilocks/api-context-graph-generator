@@ -280,29 +280,36 @@ public class MultiVisitorTest {
                     // get graph node of current method, graphNodes list only have one element, i.e. root node.
                     List<GraphNode> graphNodes = method.accept(visitor, "");
 
-                    System.out.println("\n<<<<<<<< 1. Node Names in List >>>>>>>>\n");
+                    /*
+                     * 1. Node Names in List
+                     */
 
                     visitor.nodeNameList.forEach(System.out::println);
 
-                    System.out.println("\n<<<<<<<< 2. Nodes in Depth-First Order >>>>>>>>\n");
+                    /*
+                     * 2. Nodes in Depth-First Order
+                     */
 
                     GraphNode rootNode = graphNodes.get(0);
-                    graph.depthFirstTraversal(rootNode);
+                    // graph.depthFirstTraversal(rootNode);
 
-                    System.out.println("\n<<<<<<<< 3. Nodes in Breadth-First Order >>>>>>>>\n");
+                    /*
+                     * 3. Nodes in Breadth-First Order
+                     */
 
                     // graph.breadthFirstTraversal(rootNode).forEach(node -> System.out.println(node.getNodeInfo()));
                     List<GraphNode> graphNodeList = graph.breadthFirstTraversal(rootNode);
 
-                    System.out.println("\n<<<<<<<< 4. Data and Control Flow Edge >>>>>>>>\n");
+                    /*
+                     * 4. Get Data and Control Flow Edge, and Create a Graph
+                     */
                     Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
 
                     try {
-                        GraphvizUtil.createGraph("/Users/coldilock/Downloads/first_result.dot", graphNodeList, edgeMap);
+                        GraphvizUtil.createGraphWithColor("/Users/coldilock/Downloads/first_result.dot", graphNodeList, edgeMap);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
 
                 }));
 

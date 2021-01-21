@@ -1,13 +1,10 @@
-package codeanalysis.representation;
+package entity;
 
 import com.github.javaparser.ast.stmt.Statement;
 
-import javax.swing.tree.TreeNode;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * @author coldilock

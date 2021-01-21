@@ -1,8 +1,8 @@
-package visitors3;
+package visitor.visitors3;
 
-import codeanalysis.representation.Graph;
-import codeanalysis.representation.GraphNode;
-import codeanalysis.representation.GraphNodeHelper;
+import entity.Graph;
+import entity.GraphNode;
+//import codeanalysis.representation.GraphNodeHelper;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class MethodGenericVisitor extends CustomGenericListVisitor<GraphNode, Graph> {
 
-    private GraphNodeHelper graphNodeHelper = new GraphNodeHelper();
+//    private GraphNodeHelper graphNodeHelper = new GraphNodeHelper();
 
     private StringBuilder nodeName;
 

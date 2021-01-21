@@ -1,7 +1,7 @@
-package visitorsx;
+package visitor.visitors4;
 
-import codeanalysis.representation.Graph;
-import codeanalysis.representation.GraphNode;
+import entity.Graph;
+import entity.GraphNode;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
@@ -42,7 +42,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         });
 
         GraphNode rootNode = new GraphNode("Root");
-        rootNode = graph.linkGraph(rootNode, graphNodes);
+        rootNode = graph.linkNodesInControlFlow(rootNode, graphNodes);
 
         List<GraphNode> graphResult = new ArrayList<>();
         graphResult.add(rootNode);
@@ -102,7 +102,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode conditionNode = new GraphNode("Condition");
         List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
         if(conditionChildNodes != null){
-            conditionNode = graph.linkGraph(conditionNode, conditionChildNodes);
+            conditionNode = graph.linkNodesInControlFlow(conditionNode, conditionChildNodes);
             doWhileNode.addChildNode(conditionNode);
         }
 
@@ -111,7 +111,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         graph.addNewScope();
         List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
         if(bodyChildNodes != null){
-            bodyNode = graph.linkGraph(bodyNode, bodyChildNodes);
+            bodyNode = graph.linkNodesInControlFlow(bodyNode, bodyChildNodes);
             doWhileNode.addChildNode(bodyNode);
         }
         graph.jumpOutOfScope();
@@ -175,7 +175,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode initializationNode = new GraphNode("Initialization");
         List<GraphNode> initializationChildNodes = n.getVariable().accept(this, graph);
         if(initializationChildNodes != null){
-            initializationNode = graph.linkGraph(initializationNode, initializationChildNodes);
+            initializationNode = graph.linkNodesInControlFlow(initializationNode, initializationChildNodes);
             forEachNode.addChildNode(initializationNode);
         }
 
@@ -183,7 +183,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode iterableNode = new GraphNode("Iterable");
         List<GraphNode> iterableChildNodes = n.getIterable().accept(this, graph);
         if(iterableChildNodes != null){
-            iterableNode = graph.linkGraph(iterableNode, iterableChildNodes);
+            iterableNode = graph.linkNodesInControlFlow(iterableNode, iterableChildNodes);
             forEachNode.addChildNode(iterableNode);
         }
 
@@ -191,7 +191,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode bodyNode = new GraphNode("Body");
         List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
         if(bodyChildNodes != null){
-            bodyNode = graph.linkGraph(bodyNode, bodyChildNodes);
+            bodyNode = graph.linkNodesInControlFlow(bodyNode, bodyChildNodes);
             forEachNode.addChildNode(bodyNode);
         }
 
@@ -222,7 +222,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode initializationNode = new GraphNode("Initialization");
         List<GraphNode> initializationChildNodes = n.getInitialization().accept(this, graph);
         if(initializationChildNodes != null){
-            initializationNode = graph.linkGraph(initializationNode, initializationChildNodes);
+            initializationNode = graph.linkNodesInControlFlow(initializationNode, initializationChildNodes);
             forNode.addChildNode(initializationNode);
         }
 
@@ -233,7 +233,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
             compareChildNodes = n.getCompare().get().accept(this, graph);
         }
         if(compareChildNodes != null){
-            compareNode = graph.linkGraph(compareNode, compareChildNodes);
+            compareNode = graph.linkNodesInControlFlow(compareNode, compareChildNodes);
             forNode.addChildNode(compareNode);
         }
 
@@ -241,7 +241,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode bodyNode = new GraphNode("Body");
         List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
         if(bodyChildNodes != null){
-            bodyNode = graph.linkGraph(bodyNode, bodyChildNodes);
+            bodyNode = graph.linkNodesInControlFlow(bodyNode, bodyChildNodes);
             forNode.addChildNode(bodyNode);
         }
 
@@ -249,7 +249,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode updateNode = new GraphNode("Update");
         List<GraphNode> updateChildNodes = n.getUpdate().accept(this, graph);
         if(updateChildNodes != null){
-            updateNode = graph.linkGraph(updateNode, updateChildNodes);
+            updateNode = graph.linkNodesInControlFlow(updateNode, updateChildNodes);
             forNode.addChildNode(updateNode);
         }
 
@@ -278,7 +278,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode conditionNode = new GraphNode("Condition");
         List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
         if(conditionChildNodes != null){
-            conditionNode = graph.linkGraph(conditionNode, conditionChildNodes);
+            conditionNode = graph.linkNodesInControlFlow(conditionNode, conditionChildNodes);
             ifNode.addChildNode(conditionNode);
         }
 
@@ -288,7 +288,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode thenNode = new GraphNode("Then");
         List<GraphNode> thenChildNodes = n.getThenStmt().accept(this, graph);
         if(thenChildNodes != null){
-            thenNode = graph.linkGraph(thenNode, thenChildNodes);
+            thenNode = graph.linkNodesInControlFlow(thenNode, thenChildNodes);
             ifNode.addChildNode(thenNode);
         }
 
@@ -303,7 +303,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
             elseChildNodes = n.getElseStmt().get().accept(this, graph);
         }
         if(elseChildNodes != null){
-            elseNode = graph.linkGraph(elseNode, elseChildNodes);
+            elseNode = graph.linkNodesInControlFlow(elseNode, elseChildNodes);
             ifNode.addChildNode(elseNode);
         }
 
@@ -404,7 +404,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode tryBodyNode = new GraphNode("Body");
         List<GraphNode> tryBodyChildNodes = n.getTryBlock().accept(this, graph);
         if(tryBodyChildNodes != null){
-            tryBodyNode = graph.linkGraph(tryBodyNode, tryBodyChildNodes);
+            tryBodyNode = graph.linkNodesInControlFlow(tryBodyNode, tryBodyChildNodes);
             tryNode.addChildNode(tryBodyNode);
         }
 
@@ -417,7 +417,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
             GraphNode catchClausesNode = new GraphNode("Catch");
             List<GraphNode> catchClausesChildNodes = catchClause.accept(this, graph);
             if(catchClausesChildNodes != null){
-                catchClausesNode = graph.linkGraph(catchClausesNode, catchClausesChildNodes);
+                catchClausesNode = graph.linkNodesInControlFlow(catchClausesNode, catchClausesChildNodes);
                 tryNode.addChildNode(catchClausesNode);
             }
         });
@@ -433,7 +433,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
             finallyChildNodes = n.getFinallyBlock().get().accept(this, graph);
         }
         if(finallyChildNodes != null){
-            finallyNode = graph.linkGraph(finallyNode, finallyChildNodes);
+            finallyNode = graph.linkNodesInControlFlow(finallyNode, finallyChildNodes);
             tryNode.addChildNode(finallyNode);
         }
 
@@ -471,7 +471,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode conditionNode = new GraphNode("Condition");
         List<GraphNode> conditionChildNodes = n.getCondition().accept(this, graph);
         if(conditionChildNodes != null){
-            conditionNode = graph.linkGraph(conditionNode, conditionChildNodes);
+            conditionNode = graph.linkNodesInControlFlow(conditionNode, conditionChildNodes);
             whileNode.addChildNode(conditionNode);
         }
 
@@ -479,7 +479,7 @@ public class MethodVisitorX extends GenericVisitorAdapterX<GraphNode, Graph> {
         GraphNode bodyNode = new GraphNode("Body");
         List<GraphNode> bodyChildNodes = n.getBody().accept(this, graph);
         if(bodyChildNodes != null){
-            bodyNode = graph.linkGraph(bodyNode, bodyChildNodes);
+            bodyNode = graph.linkNodesInControlFlow(bodyNode, bodyChildNodes);
             whileNode.addChildNode(bodyNode);
         }
 

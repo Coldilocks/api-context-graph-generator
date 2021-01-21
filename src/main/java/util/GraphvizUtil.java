@@ -1,12 +1,10 @@
 package util;
 
-import codeanalysis.representation.Graph;
-import codeanalysis.representation.GraphNode;
+import entity.GraphNode;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.DotPrinter;
 import com.github.javaparser.utils.Pair;
-import visitors.MethodVisitor;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,7 +12,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author coldilock

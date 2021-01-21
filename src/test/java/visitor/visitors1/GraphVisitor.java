@@ -1,8 +1,6 @@
-package visitors;
+package visitor.visitors1;
 
-import codeanalysis.representation.Graph;
-import codeanalysis.representation.GraphNode;
-import com.github.javaparser.ast.NodeList;
+import entity.Graph;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
@@ -12,7 +10,6 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

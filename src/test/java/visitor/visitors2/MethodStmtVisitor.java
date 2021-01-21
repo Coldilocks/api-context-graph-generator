@@ -1,11 +1,7 @@
-package visitors2;
+package visitor.visitors2;
 
-import codeanalysis.representation.Graph;
-import codeanalysis.representation.GraphNode;
-import com.github.javaparser.ast.expr.AssignExpr;
-import com.github.javaparser.ast.expr.BinaryExpr;
+import entity.Graph;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 

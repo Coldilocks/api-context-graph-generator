@@ -1,4 +1,4 @@
-package visitorsz;
+package visitor.visitors4;
 
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * @author coldilock
  */
-public abstract class GenericVisitorAdapterZ<R, A> implements GenericVisitor<List<R>, A> {
+public abstract class GenericVisitorAdapterX<R, A> implements GenericVisitor<List<R>, A> {
 
     public List<R> visit(final AnnotationDeclaration n, final A arg) {
         List<R> result = new ArrayList<>();

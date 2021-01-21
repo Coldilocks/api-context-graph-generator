@@ -1,4 +1,4 @@
-package visitors3;
+package visitor.visitors3;
 
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;

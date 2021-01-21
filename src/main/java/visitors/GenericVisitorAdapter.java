@@ -1,4 +1,4 @@
-package visitors3;
+package visitors;
 
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
@@ -19,72 +19,15 @@ import java.util.stream.Collectors;
 /**
  * @author coldilock
  */
-public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<List<R>, A> {
+public abstract class GenericVisitorAdapter<R, A> implements GenericVisitor<List<R>, A> {
 
     public List<R> visit(final AnnotationDeclaration n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-        {
-            tmp = n.getMembers().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
-        {
-            tmp = n.getModifiers().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
-        {
-            tmp = n.getName().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
-        {
-            tmp = n.getAnnotations().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
-        if (n.getComment().isPresent()) {
-            tmp = n.getComment().get().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
         return result;
     }
 
     public List<R> visit(final AnnotationMemberDeclaration n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-        if (n.getDefaultValue().isPresent()) {
-            tmp = n.getDefaultValue().get().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
-        {
-            tmp = n.getModifiers().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
-        {
-            tmp = n.getName().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
-        {
-            tmp = n.getType().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
-        {
-            tmp = n.getAnnotations().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
-        if (n.getComment().isPresent()) {
-            tmp = n.getComment().get().accept(this, arg);
-            if (tmp != null)
-                result.addAll(tmp);
-        }
         return result;
     }
 
@@ -101,11 +44,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -127,32 +66,20 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final ArrayCreationLevel n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         if (n.getDimension().isPresent()) {
             tmp = n.getDimension().get().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -164,11 +91,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -180,16 +103,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -206,11 +121,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -227,11 +138,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -248,22 +155,14 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final BlockComment n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -275,22 +174,14 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final BooleanLiteralExpr n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -302,11 +193,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -323,11 +210,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -344,22 +227,14 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final CharLiteralExpr n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -371,11 +246,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -402,26 +273,14 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getModifiers().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getName().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -443,16 +302,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -479,11 +330,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -505,11 +352,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -521,11 +364,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getModifiers().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getName().accept(this, arg);
             if (tmp != null)
@@ -551,16 +390,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -572,11 +403,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -593,33 +420,21 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final DoubleLiteralExpr n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final EmptyStmt n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -631,11 +446,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -657,16 +468,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -688,26 +491,14 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getModifiers().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getName().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -729,11 +520,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -745,11 +532,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -771,37 +554,21 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final FieldDeclaration n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getModifiers().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getVariables().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -828,11 +595,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -854,11 +617,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -880,11 +639,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -896,11 +651,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -912,16 +663,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -938,22 +681,14 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final IntegerLiteralExpr n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -965,27 +700,15 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
     public List<R> visit(final JavadocComment n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1002,11 +725,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1023,22 +742,13 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final LineComment n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1050,59 +760,25 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final LongLiteralExpr n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final MarkerAnnotationExpr n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-        //{
-        //    tmp = n.getName().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final MemberValuePair n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-//        {
-//            tmp = n.getName().accept(this, arg);
-//            if (tmp != null)
-//                result.addAll(tmp);
-//        }
-//        {
-//            tmp = n.getValue().accept(this, arg);
-//            if (tmp != null)
-//                result.addAll(tmp);
-//        }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1129,11 +805,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1150,11 +822,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getModifiers().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getName().accept(this, arg);
             if (tmp != null)
@@ -1180,16 +848,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -1206,11 +866,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1222,11 +878,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1238,54 +890,31 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final NormalAnnotationExpr n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-//        {
-//            tmp = n.getPairs().accept(this, arg);
-//            if (tmp != null)
-//                result.addAll(tmp);
-//        }
-//        {
-//            tmp = n.getName().accept(this, arg);
-//            if (tmp != null)
-//                result.addAll(tmp);
-//        }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final NullLiteralExpr n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final ObjectCreationExpr n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getAnonymousClassBody().isPresent()) {
-        //    tmp = n.getAnonymousClassBody().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+        // if (n.getAnonymousClassBody().isPresent()) {
+        //     tmp = n.getAnonymousClassBody().get().accept(this, arg);
+        //     if (tmp != null)
+        //         result.addAll(tmp);
+        // }
         {
             tmp = n.getArguments().accept(this, arg);
             if (tmp != null)
@@ -1306,48 +935,28 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final PackageDeclaration n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getName().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final Parameter n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //{
-        //    tmp = n.getModifiers().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         {
             tmp = n.getName().accept(this, arg);
             if (tmp != null)
@@ -1363,27 +972,15 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final PrimitiveType n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -1395,54 +992,22 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final SimpleName n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
         return result;
     }
 
     public List<R> visit(final SingleMemberAnnotationExpr n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-//        {
-//            tmp = n.getMemberValue().accept(this, arg);
-//            if (tmp != null)
-//                result.addAll(tmp);
-//        }
-//        {
-//            tmp = n.getName().accept(this, arg);
-//            if (tmp != null)
-//                result.addAll(tmp);
-//        }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
         return result;
     }
 
     public List<R> visit(final StringLiteralExpr n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
         return result;
     }
 
@@ -1454,11 +1019,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1475,11 +1036,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1496,11 +1053,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1517,11 +1070,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1533,11 +1082,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1549,11 +1094,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1581,11 +1122,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
                 result.addAll(tmp);
         }
 
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1597,11 +1134,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1618,16 +1151,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -1639,11 +1164,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1655,58 +1176,26 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
     public List<R> visit(final UnknownType n, final A arg) {
         List<R> result = new ArrayList<>();
-        List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
         return result;
     }
 
     public List<R> visit(final VariableDeclarationExpr n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //{
-        //    tmp = n.getModifiers().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getVariables().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1728,27 +1217,15 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
     public List<R> visit(final VoidType n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -1765,11 +1242,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1786,16 +1259,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -1808,11 +1273,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
     public List<R> visit(final ModuleDeclaration n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getDirectives().accept(this, arg);
             if (tmp != null)
@@ -1823,11 +1284,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1845,11 +1302,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1867,11 +1320,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1889,11 +1338,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1901,21 +1346,13 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
     public List<R> visit(final ModuleRequiresDirective n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getModifiers().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getName().accept(this, arg);
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1928,11 +1365,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1940,11 +1373,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
     public List<R> visit(final UnparsableStmt n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1952,11 +1381,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
     public List<R> visit(final ReceiverParameter n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         {
             tmp = n.getName().accept(this, arg);
             if (tmp != null)
@@ -1967,11 +1392,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -1979,16 +1400,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
     public List<R> visit(final VarType n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //{
-        //    tmp = n.getAnnotations().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
+
         return result;
     }
 
@@ -1996,11 +1409,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
     public List<R> visit(final Modifier n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -2018,11 +1427,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -2035,11 +1440,7 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
             if (tmp != null)
                 result.addAll(tmp);
         }
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 
@@ -2047,11 +1448,8 @@ public abstract class CustomGenericListVisitor<R, A> implements GenericVisitor<L
     public List<R> visit(final TextBlockLiteralExpr n, final A arg) {
         List<R> result = new ArrayList<>();
         List<R> tmp;
-        //if (n.getComment().isPresent()) {
-        //    tmp = n.getComment().get().accept(this, arg);
-        //    if (tmp != null)
-        //        result.addAll(tmp);
-        //}
+
         return result;
     }
 }
+

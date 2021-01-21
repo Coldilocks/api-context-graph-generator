@@ -1,7 +1,6 @@
-package visitors;
+package visitor.visitors1;
 
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import java.util.ArrayList;

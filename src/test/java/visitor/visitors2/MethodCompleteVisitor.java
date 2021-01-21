@@ -1,13 +1,11 @@
-package visitors2;
+package visitor.visitors2;
 
-import codeanalysis.representation.Graph;
-import codeanalysis.representation.GraphNode;
-import codeanalysis.representation.GraphNodeHelper;
-import com.github.javaparser.ast.Node;
+import entity.Graph;
+import entity.GraphNode;
+//import codeanalysis.representation.GraphNodeHelper;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ import java.util.List;
  */
 public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
 
-    private GraphNodeHelper graphNodeHelper = new GraphNodeHelper();
+//    private GraphNodeHelper graphNodeHelper = new GraphNodeHelper();
 
     private StringBuilder nodeName;
 
@@ -87,7 +85,7 @@ public class MethodCompleteVisitor extends CustomVoidVisitor<Graph> {
 
         System.out.println("\n[EXPRESSION] " + n.getExpression().toString());
 
-        graphNodeHelper.setCurrentStmt(n);
+//        graphNodeHelper.setCurrentStmt(n);
 
         super.visit(n, graph);
 

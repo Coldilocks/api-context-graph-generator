@@ -1,21 +1,10 @@
-import codeanalysis.constructor.GraphConstructor;
-import codeanalysis.representation.Graph;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import util.DataConfig;
-import visitors.*;
-import visitors2.MethodStmtVisitor;
+import visitor.visitors1.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package visitors;
+package visitor.visitors1;
 
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.FieldDeclaration;

@@ -1,6 +1,6 @@
-package visitors2;
+package visitor.visitors2;
 
-import codeanalysis.representation.Graph;
+import entity.Graph;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 

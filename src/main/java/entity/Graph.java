@@ -1,4 +1,4 @@
-package codeanalysis.representation;
+package entity;
 
 import com.github.javaparser.utils.Pair;
 import org.apache.commons.collections4.CollectionUtils;
@@ -35,11 +35,10 @@ public class Graph {
      **/
     private List<List<String>> newVarInCurrentScope = new ArrayList<>();
 
-//    private List<List<String>> dataFlowMatrix = new ArrayList<>();
-
+    /** Control flow edge pairs, (source_node_id, target_node_id) */
     private List<Pair<String, String>> controlFlowPairs = new ArrayList<>();
 
-    /** Data flow pairs, (source_node_id, target_node_id) */
+    /** Data flow edge pairs, (source_node_id, target_node_id) */
     private List<Pair<String, String>> dataFlowPairs = new ArrayList<>();
 
     public GraphNode getRootNode() {
@@ -70,7 +69,13 @@ public class Graph {
         this.lastNode = node;
     }
 
-    public GraphNode linkGraph(GraphNode rootNode, List<GraphNode> graphNodeList){
+    /**
+     * Link nodes if they are on a control flow edge
+     * @param rootNode
+     * @param graphNodeList
+     * @return
+     */
+    public GraphNode linkNodesInControlFlow(GraphNode rootNode, List<GraphNode> graphNodeList){
         if(graphNodeList == null || Objects.requireNonNull(graphNodeList).size() == 0)
             return rootNode;
 
@@ -127,20 +132,10 @@ public class Graph {
         if(!currentNodeId.isEmpty() && nodesIdWithSameVarName != null){
             String declaredNodeId = nodesIdWithSameVarName.get(nodesIdWithSameVarName.size() - 1);
             if(!declaredNodeId.equals(currentNodeId)){
-//                List<String> temp = new ArrayList<>();
-//                temp.add(varName);
-//                temp.add(declaredNodeId);
-//                temp.add(currentNodeId);
-//                dataFlowMatrix.add(temp);
-
                 dataFlowPairs.add(new Pair<>(declaredNodeId, currentNodeId));
             }
         }
     }
-
-//    public List<List<String>> getDataFlowMatrix() {
-//        return dataFlowMatrix;
-//    }
 
     public List<Pair<String, String>> getDataFlowPairs(){
         return dataFlowPairs;

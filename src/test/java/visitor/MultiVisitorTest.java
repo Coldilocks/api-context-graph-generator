@@ -1,8 +1,8 @@
 package visitor;
 
-import codeanalysis.constructor.GraphConstructor;
-import codeanalysis.representation.Graph;
-import codeanalysis.representation.GraphNode;
+//import codeanalysis.constructor.GraphConstructor;
+import entity.Graph;
+import entity.GraphNode;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -17,10 +17,10 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import com.github.javaparser.utils.Pair;
 import util.DataConfig;
 import util.GraphvizUtil;
-import visitors.*;
-import visitors2.MethodCompleteVisitor;
-import visitors2.MethodStmtVisitor;
-import visitorsz.MethodVisitorZ;
+import visitor.visitors1.*;
+import visitor.visitors2.MethodCompleteVisitor;
+import visitor.visitors2.MethodStmtVisitor;
+import visitors.MethodVisitor;
 //import visitorsx.MethodVisitorX;
 
 import java.io.File;
@@ -81,8 +81,8 @@ public class MultiVisitorTest {
 
         String filePath = DataConfig.TEST_INPUT_JAVA_FILE;
 
-        GraphConstructor graphConstructor = new GraphConstructor();
-        graphConstructor.createGraph(filePath);
+//        GraphConstructor graphConstructor = new GraphConstructor();
+//        graphConstructor.createGraph(filePath);
 
     }
 
@@ -128,7 +128,7 @@ public class MultiVisitorTest {
                 type.getMethods().forEach(method -> {
                     System.out.println("<<<<<<<<<<");
                     Graph graph = new Graph();
-                    MethodVisitor methodVisitor = new MethodVisitor();
+                    visitor.visitors1.MethodVisitor methodVisitor = new visitor.visitors1.MethodVisitor();
                     method.accept(methodVisitor, graph);
 //                    System.out.println(graph);
                     System.out.println(">>>>>>>>>>");
@@ -166,7 +166,7 @@ public class MultiVisitorTest {
 
         CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
 
-        MethodVisitor methodVisitor = new MethodVisitor();
+        visitor.visitors1.MethodVisitor methodVisitor = new visitor.visitors1.MethodVisitor();
         cu.accept(methodVisitor, new Graph());
 
 //        cu.findAll(MethodCallExpr.class).forEach(mce ->
@@ -276,7 +276,7 @@ public class MultiVisitorTest {
                 type.getMethods().forEach(method -> {
                     Graph graph = new Graph();
 
-                    MethodVisitorZ visitor = new MethodVisitorZ(graph);
+                    MethodVisitor visitor = new MethodVisitor(graph);
                     // get graph node of current method, graphNodes list only have one element, i.e. root node.
                     List<GraphNode> graphNodes = method.accept(visitor, "");
 

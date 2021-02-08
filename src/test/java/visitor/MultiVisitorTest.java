@@ -1,8 +1,8 @@
 package visitor;
 
-import codeanalysis.constructor.GraphConstructor;
-import codeanalysis.representation.Graph;
-import codeanalysis.representation.GraphNode;
+//import codeanalysis.constructor.GraphConstructor;
+import entity.Graph;
+import entity.GraphNode;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -14,17 +14,21 @@ import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.github.javaparser.utils.Pair;
 import util.DataConfig;
-import visitors.*;
-import visitors2.MethodCompleteVisitor;
-import visitors2.MethodStmtVisitor;
-import visitors3.MethodGenericVisitor;
-import visitorsx.MethodVisitorX;
+import util.GraphvizUtil;
+import visitor.visitors1.*;
+import visitor.visitors2.MethodCompleteVisitor;
+import visitor.visitors2.MethodStmtVisitor;
+import visitors.MethodVisitor;
+//import visitorsx.MethodVisitorX;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author coldilock
@@ -57,11 +61,44 @@ public class MultiVisitorTest {
         // getJdkAndCustomType();
 
         // using MethodGenericVisitor
-        getControlFlow();
+//        getControlFlow();
+
+        // using MethodGVisitor
+         getControlAndDataFlow();
 
         // pre order the tree
         // preOrder();
 
+        // java.io.File.new(java.lang.String)
+        // java.lang.String.String()
+        // java.lang.String.new()
+
+
+//        String str = "java.io.File.File(java.lang.String)";
+//        String str = "java.lang.String.String(java.lang.String)";
+//
+//        System.out.println(StringUtil.replaceName(str));
+    }
+
+    /**
+     * replace the second className to "new"
+     * @param originStr e.g. "java.lang.String.String()"
+     * @return e.g. "java.lang.String.new()"
+     */
+    public static String replaceName(String originStr){
+        Pattern P = Pattern.compile("([A-Za-z][A-Za-z0-9]*\\.)+([A-Z][A-Za-z0-9]*\\()");
+
+        Matcher m = P.matcher(originStr);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String matchedStr = m.group();
+            String needReplaceStr = m.group(2);
+            String prefixStr = matchedStr.substring(0, matchedStr.length() - needReplaceStr.length());
+            m.appendReplacement(sb, prefixStr + "new(");
+        }
+        m.appendTail(sb);
+
+        return sb.toString();
     }
 
     public static void run(String[] args) throws FileNotFoundException {
@@ -77,8 +114,8 @@ public class MultiVisitorTest {
 
         String filePath = DataConfig.TEST_INPUT_JAVA_FILE;
 
-        GraphConstructor graphConstructor = new GraphConstructor();
-        graphConstructor.createGraph(filePath);
+//        GraphConstructor graphConstructor = new GraphConstructor();
+//        graphConstructor.createGraph(filePath);
 
     }
 
@@ -124,7 +161,7 @@ public class MultiVisitorTest {
                 type.getMethods().forEach(method -> {
                     System.out.println("<<<<<<<<<<");
                     Graph graph = new Graph();
-                    MethodVisitor methodVisitor = new MethodVisitor();
+                    visitor.visitors1.MethodVisitor methodVisitor = new visitor.visitors1.MethodVisitor();
                     method.accept(methodVisitor, graph);
 //                    System.out.println(graph);
                     System.out.println(">>>>>>>>>>");
@@ -162,7 +199,7 @@ public class MultiVisitorTest {
 
         CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
 
-        MethodVisitor methodVisitor = new MethodVisitor();
+        visitor.visitors1.MethodVisitor methodVisitor = new visitor.visitors1.MethodVisitor();
         cu.accept(methodVisitor, new Graph());
 
 //        cu.findAll(MethodCallExpr.class).forEach(mce ->
@@ -213,7 +250,49 @@ public class MultiVisitorTest {
      * get the control flow graph for a method
      * @throws IOException
      */
-    public static void getControlFlow() throws IOException {
+//    public static void getControlFlow() throws IOException {
+//
+//        String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
+//
+//        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
+//        typeSolver.add(new ReflectionTypeSolver());
+//        typeSolver.add(JarTypeSolver.getJarTypeSolver(jarFile));
+//
+//        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
+//        StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
+//
+//        CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
+//
+//        cu.getTypes().forEach(type ->
+//                type.getMethods().forEach(method -> {
+//                    System.out.println("\n<<<<<<<< 1.Visiting >>>>>>>>\n");
+//                    Graph graph = new Graph();
+//
+//                    MethodVisitorX visitor = new MethodVisitorX();
+//                    // get graph node of current method, graphNodes list only have one element, i.e. root node.
+//                    List<GraphNode> graphNodes = method.accept(visitor, graph);
+//
+//                    System.out.println("\n<<<<<<<< 2.Nodes in List >>>>>>>>\n");
+//
+//                    visitor.nodeNameList.forEach(System.out::println);
+//
+//                    System.out.println("\n<<<<<<<< 3.Nodes in Tree >>>>>>>>\n");
+//
+//                    GraphNode rootNode = graphNodes.get(0);
+//                    rootNode.traversalTree(rootNode);
+//
+//                    System.out.println("\n<<<<<<<< 4.Data dependency >>>>>>>>\n");
+//
+//                    graph.getDataFlowMatrix().forEach(System.out::println);
+//
+//
+//                }));
+//
+//
+//
+//    }
+
+    public static void getControlAndDataFlow() throws IOException {
 
         String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
 
@@ -228,18 +307,42 @@ public class MultiVisitorTest {
 
         cu.getTypes().forEach(type ->
                 type.getMethods().forEach(method -> {
-                    System.out.println("<<<<<<<< START >>>>>>>>");
                     Graph graph = new Graph();
 
-                    MethodVisitorX visitor = new MethodVisitorX();
-                    // graphNodes is the final result
-                    List<GraphNode> graphNodes = method.accept(visitor, graph);
+                    MethodVisitor visitor = new MethodVisitor(graph);
+                    // get graph node of current method, graphNodes list only have one element, i.e. root node.
+                    List<GraphNode> graphNodes = method.accept(visitor, "");
 
-                    System.out.println("<<<<<<<< END >>>>>>>>");
-
-                    System.out.println();
+                    /*
+                     * 1. Node Names in List
+                     */
 
                     visitor.nodeNameList.forEach(System.out::println);
+
+                    /*
+                     * 2. Nodes in Depth-First Order
+                     */
+
+                    GraphNode rootNode = graphNodes.get(0);
+                    // graph.depthFirstTraversal(rootNode);
+
+                    /*
+                     * 3. Nodes in Breadth-First Order
+                     */
+
+                    // graph.breadthFirstTraversal(rootNode).forEach(node -> System.out.println(node.getNodeInfo()));
+                    List<GraphNode> graphNodeList = graph.breadthFirstTraversal(rootNode);
+
+                    /*
+                     * 4. Get Data and Control Flow Edge, and Create a Graph
+                     */
+                    Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
+
+                    try {
+                        GraphvizUtil.createGraphWithColor("/Users/coldilock/Downloads/first_result.dot", graphNodeList, edgeMap);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                 }));
 

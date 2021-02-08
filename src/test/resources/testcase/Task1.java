@@ -31,20 +31,51 @@ public class Task1{
 //
 //    }
 
-    public String readContentFromFile(String path) throws FileNotFoundException {
+    public void readContentFromFile(String path) throws FileNotFoundException {
 //        StringBuilder str = new StringBuilder("text".toString());
 //        System.out.println("hello world");
-//
+
 //        int[][] test = new int[3][4];
 //        int index = 0;
 //        int a = test[index];
 
-//        String test = "test";
-//        String helloStr = test.toLowerCase();
+//        for(char x : "hello"){
+//            System.out.println(c);
+//        }
 
-        // List<String> list = new ArrayList<String>();
-//        int i = 10, j =10;
+
+//         List<String> list = new ArrayList<String>();
+//         int i = 10, j =10;
+
+
+        // test case 1:
+//        String test;
+//        String str1 = "hello world";
+//        test = str1.replace("test", "").toString();
 //
+//        if(!str1.isEmpty()){
+//            test = "!";
+//            test.toString();
+//            String testForScopeVar = "hello";
+//            testForScopeVar.toLowerCase();
+//        }
+//        String testForScopeVar = "world";
+//        testForScopeVar.toString();
+//
+//        str1 = test.replace("test", "").toString();
+
+
+
+        // test case 2:
+//        String str1 = new String("hello world");
+//        String temp1 = "test";
+//        String temp2 = "test";
+//        String str2 = str1.concat(temp1.toString()).replaceAll(temp1.toUpperCase(), temp2);
+//        str2.length();
+
+
+
+        // test case 3:
         File file = new File(path);
         StringBuilder stringBuilder = new StringBuilder();
         do{

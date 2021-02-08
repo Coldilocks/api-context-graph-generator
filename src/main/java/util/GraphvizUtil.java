@@ -66,7 +66,9 @@ public class GraphvizUtil {
                     .append(edge.b)
                     .append("[label=\"")
                     .append("c")
-                    .append("\"]\n");
+                    .append("\", ")
+                    .append("style=bold")
+                    .append("]\n");
         }
 
         StringBuilder dEdgesInResult = new StringBuilder();

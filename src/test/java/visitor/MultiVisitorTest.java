@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author coldilock
@@ -61,11 +63,42 @@ public class MultiVisitorTest {
         // using MethodGenericVisitor
 //        getControlFlow();
 
-        // using MethodGenericVisitorZ
-        getControlFlowZ();
+        // using MethodGVisitor
+         getControlAndDataFlow();
 
         // pre order the tree
         // preOrder();
+
+        // java.io.File.new(java.lang.String)
+        // java.lang.String.String()
+        // java.lang.String.new()
+
+
+//        String str = "java.io.File.File(java.lang.String)";
+//        String str = "java.lang.String.String(java.lang.String)";
+//
+//        System.out.println(StringUtil.replaceName(str));
+    }
+
+    /**
+     * replace the second className to "new"
+     * @param originStr e.g. "java.lang.String.String()"
+     * @return e.g. "java.lang.String.new()"
+     */
+    public static String replaceName(String originStr){
+        Pattern P = Pattern.compile("([A-Za-z][A-Za-z0-9]*\\.)+([A-Z][A-Za-z0-9]*\\()");
+
+        Matcher m = P.matcher(originStr);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String matchedStr = m.group();
+            String needReplaceStr = m.group(2);
+            String prefixStr = matchedStr.substring(0, matchedStr.length() - needReplaceStr.length());
+            m.appendReplacement(sb, prefixStr + "new(");
+        }
+        m.appendTail(sb);
+
+        return sb.toString();
     }
 
     public static void run(String[] args) throws FileNotFoundException {
@@ -259,7 +292,7 @@ public class MultiVisitorTest {
 //
 //    }
 
-    public static void getControlFlowZ() throws IOException {
+    public static void getControlAndDataFlow() throws IOException {
 
         String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
 

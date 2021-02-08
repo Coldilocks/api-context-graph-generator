@@ -394,9 +394,17 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
         graph.addNewScope();
 
         // examine the try block and get try body node
-        GraphNode tryBodyNode = new GraphNode("Body", StringUtil.getUuid());
+//        GraphNode tryBodyNode = new GraphNode("Body", StringUtil.getUuid());
+//        List<GraphNode> tryBodyChildNodes = n.getTryBlock().accept(this, nodeId);
+//        if(tryBodyChildNodes != null){
+//            tryBodyNode = graph.linkNodesInControlFlow(tryBodyNode, tryBodyChildNodes);
+//            tryNode.addChildNode(tryBodyNode);
+//        }
+//        GraphNode tryBodyNode = new GraphNode("Body", StringUtil.getUuid());
         List<GraphNode> tryBodyChildNodes = n.getTryBlock().accept(this, nodeId);
         if(tryBodyChildNodes != null){
+            GraphNode tryBodyNode = tryBodyChildNodes.get(0);
+            tryBodyChildNodes.remove(0);
             tryBodyNode = graph.linkNodesInControlFlow(tryBodyNode, tryBodyChildNodes);
             tryNode.addChildNode(tryBodyNode);
         }
@@ -692,7 +700,6 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
          * obj.method1(method2())
          * output: method2() -> method1()
          */
-        // todo: pass currentNodeId to n.getArguments, pass nodeId to n.getScope
         List<GraphNode> childNodes = super.visit(n, currentNodeId);
         if(childNodes != null){
             graphNodes.addAll(childNodes);
@@ -779,14 +786,17 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
         currentNodeName.append(objCreationName);
         nodeNameList.add(currentNodeName.toString());
 
+        // String finalObjCreationNodeName = currentNodeName.toString().replace("\\..*?\\(","\\.new\\(");
+
         if(n.getParentNode().isPresent()){
+
             String originalStmt = n.getParentNode().get().toString();
             String varIdentifier = ((VariableDeclarator) n.getParentNode().get()).getNameAsString();
-            graphNodes.add(new GraphNode(currentNodeName.toString(), varIdentifier, "ObjCreation", originalStmt, currentNodeId));
+            graphNodes.add(new GraphNode(StringUtil.replaceName(currentNodeName.toString()), varIdentifier, "ObjCreation", originalStmt, currentNodeId));
 
         } else {
             // e.g. 'new File();'
-            graphNodes.add(new GraphNode(currentNodeName.toString(), "unknown", "ObjCreation", n.toString(), currentNodeId));
+            graphNodes.add(new GraphNode(StringUtil.replaceName(currentNodeName.toString()), "unknown", "ObjCreation", n.toString(), currentNodeId));
         }
 
         return graphNodes;

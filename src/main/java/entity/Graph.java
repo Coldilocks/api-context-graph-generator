@@ -190,9 +190,8 @@ public class Graph {
     public List<Pair<String, String>> getControlFlow(GraphNode root){
 
         this.controlFlowPairs =  this.breadthFirstTraversal(root).stream()
-                .flatMap(parentNode->parentNode.getChildNodes().stream()
-                        .map(childNode->new Pair<>(parentNode.getId(), childNode.getId()))
-
+                .flatMap(parentNode -> parentNode.getChildNodes().stream()
+                        .map(childNode -> new Pair<>(parentNode.getId(), childNode.getId()))
                 ).collect(Collectors.toList());
 
         return this.controlFlowPairs;
@@ -222,7 +221,8 @@ public class Graph {
     }
 
     /**
-     * get data flow edge(d), control flow edge(c), data and control flow edge(cd)
+     * Get data flow edge(d), control flow edge(c), data and control flow edge(cd)
+     * @param root
      * @return
      */
     public Map<String, List<Pair<String, String>>> getControlAndDataFlowPairs(GraphNode root){

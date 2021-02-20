@@ -74,7 +74,6 @@ public class Task1{
 //        str2.length();
 
 
-
         // test case 3:
         File file = new File(path);
         StringBuilder stringBuilder = new StringBuilder();

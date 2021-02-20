@@ -26,7 +26,8 @@ public class GraphNode implements Cloneable, Serializable {
     private String originalStatement;
     /** javaparser statement node */
     private Statement japaStatement;
-
+    /** next node along the control flow, not the child node inside the statement of control node*/
+    private GraphNode nextNode;
 
     public GraphNode(){
         this.childNodes = new ArrayList<>();
@@ -120,6 +121,13 @@ public class GraphNode implements Cloneable, Serializable {
         this.childNodes.add(graphNode);
     }
 
+    public GraphNode getNextNode() {
+        return nextNode;
+    }
+
+    public void setNextNode(GraphNode nextNode) {
+        this.nextNode = nextNode;
+    }
 
     public String getNodeInfo() {
         return "GraphNode{" +

@@ -1,6 +1,8 @@
 package visitor;
 
 //import codeanalysis.constructor.GraphConstructor;
+import dataset.Constructor;
+import dataset.HoleCreator;
 import entity.Graph;
 import entity.GraphNode;
 import com.github.javaparser.StaticJavaParser;
@@ -36,11 +38,16 @@ import java.util.regex.Pattern;
 public class MultiVisitorTest {
 
     private static String filePath = "src/test/resources/testcase/Task1.java";
-
+//    private static String filePath = "/Users/coldilock/Downloads/test.java";
 
     public static void main(String[] args) throws IOException {
-
         // run(args);
+
+        // using MethodGVisitor
+         getControlAndDataFlow();
+
+        // visitor for a java file
+        // testForSpecial();
 
         // get import list with or without asterisk
         // testForImport();
@@ -63,8 +70,7 @@ public class MultiVisitorTest {
         // using MethodGenericVisitor
 //        getControlFlow();
 
-        // using MethodGVisitor
-         getControlAndDataFlow();
+
 
         // pre order the tree
         // preOrder();
@@ -344,6 +350,13 @@ public class MultiVisitorTest {
                         e.printStackTrace();
                     }
 
+                    /*
+                     * 5. 构造数据集
+                     */
+                    HoleCreator holeCreator = new HoleCreator(rootNode, graphNodeList, edgeMap, filePath, method.getNameAsString());
+                    holeCreator.createHoleWithHoleRange();
+                    Constructor.createDataSet();
+
                 }));
 
 
@@ -378,11 +391,14 @@ public class MultiVisitorTest {
 
     }
 
-
-
-
-
-
-
+    /**
+     * visitor for a java file
+     * @throws FileNotFoundException
+     */
+    public static void runClazzVisitor() throws FileNotFoundException {
+        CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
+        TestVisitor x = new TestVisitor();
+        cu.accept(x, "");
+    }
 
 }

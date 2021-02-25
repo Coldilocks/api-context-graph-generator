@@ -31,6 +31,25 @@ public class Task1{
 //
 //    }
 
+//    public void test(){
+//        int a = 0;
+//
+//        switch (a){
+//            case 0:
+//                System.out.println(a);
+//                break;
+//            case 1:
+//                System.out.println("hello world".toString());
+//                break;
+//            default:
+//                System.out.println("hello world".toLowerCase());
+//        }
+//
+//        int b = 0;
+//    }
+
+    private File file;
+
     public void readContentFromFile(String path) throws FileNotFoundException {
 //        StringBuilder str = new StringBuilder("text".toString());
 //        System.out.println("hello world");
@@ -74,8 +93,15 @@ public class Task1{
 //        str2.length();
 
 
-
         // test case 3:
+//        File file = new File(path);
+
+        // test case 4: conditional expression
+//        String xx = "test";
+//        String x = xx.isEmpty() ? xx.toLowerCase() : xx.toUpperCase();
+
+
+//        this.file = new File(path);
         File file = new File(path);
         StringBuilder stringBuilder = new StringBuilder();
         do{

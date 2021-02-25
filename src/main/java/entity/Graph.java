@@ -3,6 +3,7 @@ package entity;
 import com.github.javaparser.utils.Pair;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,6 +76,20 @@ public class Graph {
      * @param graphNodeList
      * @return
      */
+//    public GraphNode linkNodesInControlFlow(GraphNode rootNode, List<GraphNode> graphNodeList){
+//        if(graphNodeList == null || Objects.requireNonNull(graphNodeList).size() == 0)
+//            return rootNode;
+//
+//        for(int i = 0; i < graphNodeList.size() - 1; i++){
+//            graphNodeList.get(i).addChildNode(graphNodeList.get(i + 1));
+//            graphNodeList.get(i + 1).setParentNode(graphNodeList.get(i));
+//        }
+//
+//        rootNode.addChildNode(graphNodeList.get(0));
+//        graphNodeList.get(0).setParentNode(rootNode);
+//
+//        return rootNode;
+//    }
     public GraphNode linkNodesInControlFlow(GraphNode rootNode, List<GraphNode> graphNodeList){
         if(graphNodeList == null || Objects.requireNonNull(graphNodeList).size() == 0)
             return rootNode;
@@ -82,10 +97,16 @@ public class Graph {
         for(int i = 0; i < graphNodeList.size() - 1; i++){
             graphNodeList.get(i).addChildNode(graphNodeList.get(i + 1));
             graphNodeList.get(i + 1).setParentNode(graphNodeList.get(i));
+
+            // 设置next node
+            graphNodeList.get(i).setNextNode(graphNodeList.get(i + 1));
         }
 
         rootNode.addChildNode(graphNodeList.get(0));
         graphNodeList.get(0).setParentNode(rootNode);
+
+        // 设置root node的next node
+        rootNode.setNextNode(graphNodeList.get(0));
 
         return rootNode;
     }
@@ -242,6 +263,21 @@ public class Graph {
         result.put("cd", controlFlowAndDataFlowPairs);
 
         return result;
+    }
+
+    public static GraphNode copyGraph(GraphNode rootNode) {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(rootNode);
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            GraphNode copiedGraph = (GraphNode) ois.readObject();
+            return copiedGraph;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

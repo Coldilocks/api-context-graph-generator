@@ -1,5 +1,3 @@
-package visitor;
-
 //import codeanalysis.constructor.GraphConstructor;
 import dataset.Constructor;
 import dataset.HoleCreator;
@@ -19,6 +17,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import com.github.javaparser.utils.Pair;
 import util.DataConfig;
 import util.GraphvizUtil;
+import visitor.TestVisitor;
 import visitor.visitors1.*;
 import visitor.visitors2.MethodCompleteVisitor;
 import visitor.visitors2.MethodStmtVisitor;
@@ -42,7 +41,6 @@ public class MultiVisitorTest {
 
     public static void main(String[] args) throws IOException {
         // run(args);
-
         // using MethodGVisitor
          getControlAndDataFlow();
 
@@ -84,6 +82,71 @@ public class MultiVisitorTest {
 //        String str = "java.lang.String.String(java.lang.String)";
 //
 //        System.out.println(StringUtil.replaceName(str));
+    }
+
+    public static void getControlAndDataFlow() throws IOException {
+
+        String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
+
+        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
+        typeSolver.add(new ReflectionTypeSolver());
+        typeSolver.add(JarTypeSolver.getJarTypeSolver(jarFile));
+
+        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
+        StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
+
+        CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
+
+        cu.getTypes().forEach(type ->
+                type.getMethods().forEach(method -> {
+                    Graph graph = new Graph();
+
+                    MethodVisitor visitor = new MethodVisitor(graph);
+                    // get graph node of current method, graphNodes list only have one element, i.e. root node.
+                    List<GraphNode> graphNodes = method.accept(visitor, "");
+
+                    /*
+                     * 1. Node Names in List
+                     */
+
+                    visitor.nodeNameList.forEach(System.out::println);
+
+                    /*
+                     * 2. Nodes in Depth-First Order
+                     */
+
+                    GraphNode rootNode = graphNodes.get(0);
+                    // graph.depthFirstTraversal(rootNode);
+
+                    /*
+                     * 3. Nodes in Breadth-First Order
+                     */
+
+                    // graph.breadthFirstTraversal(rootNode).forEach(node -> System.out.println(node.getNodeInfo()));
+                    List<GraphNode> graphNodeList = graph.breadthFirstTraversal(rootNode);
+
+                    /*
+                     * 4. Get Data and Control Flow Edge, and Create a Graph
+                     */
+                    Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
+
+                    try {
+                        GraphvizUtil.createGraphWithColor("/Users/coldilock/Downloads/first_result.dot", graphNodeList, edgeMap);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    /*
+                     * 5. 构造数据集
+                     */
+                    HoleCreator holeCreator = new HoleCreator(rootNode, graphNodeList, edgeMap, filePath, method.getNameAsString());
+                    holeCreator.createHoleWithHoleRange();
+                    Constructor.createDataSet();
+
+                }));
+
+
+
     }
 
     /**
@@ -297,71 +360,6 @@ public class MultiVisitorTest {
 //
 //
 //    }
-
-    public static void getControlAndDataFlow() throws IOException {
-
-        String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
-
-        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
-        typeSolver.add(new ReflectionTypeSolver());
-        typeSolver.add(JarTypeSolver.getJarTypeSolver(jarFile));
-
-        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
-        StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
-
-        CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
-
-        cu.getTypes().forEach(type ->
-                type.getMethods().forEach(method -> {
-                    Graph graph = new Graph();
-
-                    MethodVisitor visitor = new MethodVisitor(graph);
-                    // get graph node of current method, graphNodes list only have one element, i.e. root node.
-                    List<GraphNode> graphNodes = method.accept(visitor, "");
-
-                    /*
-                     * 1. Node Names in List
-                     */
-
-                    visitor.nodeNameList.forEach(System.out::println);
-
-                    /*
-                     * 2. Nodes in Depth-First Order
-                     */
-
-                    GraphNode rootNode = graphNodes.get(0);
-                    // graph.depthFirstTraversal(rootNode);
-
-                    /*
-                     * 3. Nodes in Breadth-First Order
-                     */
-
-                    // graph.breadthFirstTraversal(rootNode).forEach(node -> System.out.println(node.getNodeInfo()));
-                    List<GraphNode> graphNodeList = graph.breadthFirstTraversal(rootNode);
-
-                    /*
-                     * 4. Get Data and Control Flow Edge, and Create a Graph
-                     */
-                    Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
-
-                    try {
-                        GraphvizUtil.createGraphWithColor("/Users/coldilock/Downloads/first_result.dot", graphNodeList, edgeMap);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    /*
-                     * 5. 构造数据集
-                     */
-                    HoleCreator holeCreator = new HoleCreator(rootNode, graphNodeList, edgeMap, filePath, method.getNameAsString());
-                    holeCreator.createHoleWithHoleRange();
-                    Constructor.createDataSet();
-
-                }));
-
-
-
-    }
 
 
     private static void preOrder() throws FileNotFoundException {

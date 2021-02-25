@@ -1,5 +1,6 @@
 package visitors;
 
+import com.github.javaparser.ast.Node;
 import entity.Graph;
 import entity.GraphNode;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -8,6 +9,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Get;
 import util.StringUtil;
 
 import java.util.ArrayList;
@@ -22,7 +24,6 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
     public Graph graph;
 
     public List<String> nodeNameList = new ArrayList<>();
-
 
     private boolean checkNodeName(String str){
         return !str.isEmpty() && !str.startsWith(".");
@@ -332,29 +333,114 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
     }
 
     /**
-     * ConditionalExpr
-     * todo: examine switch statement
+     * <h2>Switch Statement</h2>
+     *
+     * Switch statements are odd in terms of scoping:
+     * <br><br>RIGHT:
+     * <br>{@code switch(a) { case 0: int test = 0; System.out.println(test); case 1: test = 1; System.out.println(test);}}
+     * <br><br>ERROR: The local variable value may not have been initialized.
+     * <br>{@code switch(a) { case 0: int test = 0; System.out.println(test); case 1: System.out.println(test);}}
+     *
+     * <br><br>The 'int test' part tells the compiler at compile time that you have a variable called 'test' which is an int.
+     * The 'test = 0' part initializes it, but that happens at run-time, and doesn't happen at all if that branch of the switch isn't entered.
      * @param n
      * @param nodeId
      * @return
      */
     @Override
     public List<GraphNode> visit(SwitchStmt n, String nodeId) {
-        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
+
+        GraphNode switchNode = new GraphNode("Switch", StringUtil.getUuid());
+
+        graph.addNewScope();
+
+        // examine the selector and get selector node
+        GraphNode selectorNode = new GraphNode("Selector", StringUtil.getUuid());
+        List<GraphNode> selectorChildNodes = n.getSelector().accept(this, nodeId);
+        if(selectorChildNodes != null){
+            selectorNode = graph.linkNodesInControlFlow(selectorNode, selectorChildNodes);
+            switchNode.addChildNode(selectorNode);
+            selectorNode.setParentNode(switchNode);
+        }
+
+        graph.jumpOutOfScope();
+
+        graph.addNewScope();
+
+        // examine statements inside every case (SwitchEntry in JavaParser)
+        n.getEntries().forEach(switchEntry -> {
+            GraphNode caseNode = new GraphNode("Case", StringUtil.getUuid());
+            List<GraphNode> caseChildNodes = switchEntry.accept(this, nodeId);
+            if(caseChildNodes != null){
+                caseNode = graph.linkNodesInControlFlow(caseNode, caseChildNodes);
+                switchNode.addChildNode(caseNode);
+                caseNode.setParentNode(switchNode);
+            }
+        });
+
+        graph.jumpOutOfScope();
+
+        graphNodes.add(switchNode);
+        return graphNodes;
+    }
+
+    @Override
+    public List<GraphNode> visit(SwitchEntry n, String nodeId) {
+        List<GraphNode> graphNodes = new ArrayList<>();
+
+        // Get childNodes from statements inside case
+        List<GraphNode> childNodes = super.visit(n, nodeId);
+        if(childNodes != null){
+            graphNodes.addAll(childNodes);
+        }
+
         return graphNodes;
     }
 
     /**
+     * Switch Expression
      * In Java 12, 'switch' can also be used as an expression
+     * The process is same as SwitchStmt
      * @param n
      * @param nodeId
      * @return
      */
     @Override
     public List<GraphNode> visit(SwitchExpr n, String nodeId) {
-        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
+
+        GraphNode switchNode = new GraphNode("Switch", StringUtil.getUuid());
+
+        graph.addNewScope();
+
+        // examine the selector and get selector node
+        GraphNode selectorNode = new GraphNode("Selector", StringUtil.getUuid());
+        List<GraphNode> selectorChildNodes = n.getSelector().accept(this, nodeId);
+        if(selectorChildNodes != null){
+            selectorNode = graph.linkNodesInControlFlow(selectorNode, selectorChildNodes);
+            switchNode.addChildNode(selectorNode);
+            selectorNode.setParentNode(switchNode);
+        }
+
+        graph.jumpOutOfScope();
+
+        graph.addNewScope();
+
+        // examine statements inside every case (SwitchEntry in JavaParser)
+        n.getEntries().forEach(switchEntry -> {
+            GraphNode caseNode = new GraphNode("Case", StringUtil.getUuid());
+            List<GraphNode> caseChildNodes = switchEntry.accept(this, nodeId);
+            if(caseChildNodes != null){
+                caseNode = graph.linkNodesInControlFlow(caseNode, caseChildNodes);
+                switchNode.addChildNode(caseNode);
+                caseNode.setParentNode(switchNode);
+            }
+        });
+
+        graph.jumpOutOfScope();
+
+        graphNodes.add(switchNode);
         return graphNodes;
     }
 
@@ -444,7 +530,7 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
     }
 
     /**
-     * todo: examine ThrowStmt
+     * Throw Statement
      * @param n
      * @param nodeId
      * @return
@@ -497,7 +583,6 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
         List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
-
 
     /**
      * todo: examine SynchronizedStmt
@@ -552,7 +637,7 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
     }
 
     /**
-     * todo: ArrayAccessExpr
+     * Array Access Expression
      * @param n
      * @param nodeId
      * @return
@@ -566,7 +651,7 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
     }
 
     /**
-     * todo: ArrayCreationExpr
+     * Array Creation Expression
      * @param n
      * @param nodeId
      * @return
@@ -580,7 +665,7 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
     }
 
     /**
-     * todo: ArrayInitializerExpr
+     * Array Initializer Expression
      * @param n
      * @param nodeId
      * @return
@@ -728,12 +813,23 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
         currentNodeName.append(objCreationName);
         nodeNameList.add(currentNodeName.toString());
 
-        // String finalObjCreationNodeName = currentNodeName.toString().replace("\\..*?\\(","\\.new\\(");
-
         if(n.getParentNode().isPresent()){
 
             String originalStmt = n.getParentNode().get().toString();
-            String varIdentifier = ((VariableDeclarator) n.getParentNode().get()).getNameAsString();
+
+            String varIdentifier = "unknown";
+
+            // parentNode could be VariableDeclarator or AssignExpr
+            try{
+                varIdentifier = ((VariableDeclarator) n.getParentNode().get()).getNameAsString();
+            } catch (ClassCastException ignored){
+            }
+
+            try{
+                varIdentifier = ((AssignExpr) n.getParentNode().get()).getTarget().toString();
+            } catch (ClassCastException ignored){
+            }
+
             graphNodes.add(new GraphNode(StringUtil.replaceName(currentNodeName.toString()), varIdentifier, "ObjCreation", originalStmt, currentNodeId));
 
         } else {
@@ -901,8 +997,11 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(ConditionalExpr n, String nodeId) {
-        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
+        List<GraphNode> childNodes = super.visit(n, nodeId);
+        if(childNodes != null){
+            graphNodes.addAll(childNodes);
+        }
         return graphNodes;
     }
 
@@ -966,7 +1065,6 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(UnaryExpr n, String nodeId) {
-
         List<GraphNode> graphNodes = new ArrayList<>();
         List<GraphNode> childNodes = super.visit(n, nodeId);
         if(childNodes != null){

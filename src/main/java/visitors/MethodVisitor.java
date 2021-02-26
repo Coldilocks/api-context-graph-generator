@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <h1>Method Visitor</h1>
+ * visit every statement in a method, then generate an AST for this method
  * @author coldilock
  */
 public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
@@ -876,10 +878,11 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
         }
         currentNodeName.append(methodSignature);
 
-
         if(checkNodeName(currentNodeName.toString())){
             nodeNameList.add(currentNodeName.toString());
-            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "MethodCall", n.toString(), currentNodeId));
+//            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "MethodCall", n.toString(), currentNodeId));
+            // method name will not be recorded
+            graphNodes.add(new GraphNode(currentNodeName.toString(), "MethodCall", n.toString(), currentNodeId));
         }
 
         return graphNodes;

@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author coldilock
  */
-public class Constructor {
+public class DataCollector {
     public static List<List<String>> graphVocabList = new ArrayList<>();
     public static List<List<String>> graphReprensentList = new ArrayList<>();
     public static List<String> traceList = new ArrayList<>();

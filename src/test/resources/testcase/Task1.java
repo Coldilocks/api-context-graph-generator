@@ -48,7 +48,7 @@ public class Task1{
 //        int b = 0;
 //    }
 
-    private File file;
+//    private File file;
 
     public void readContentFromFile(String path) throws FileNotFoundException {
 //        StringBuilder str = new StringBuilder("text".toString());

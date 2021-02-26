@@ -4,178 +4,195 @@ import com.github.javaparser.utils.Pair;
 import entity.Graph;
 import entity.GraphNode;
 import org.apache.commons.collections4.CollectionUtils;
+import util.DataConfig;
+import util.FileUtil;
 import util.StringUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * <h1>Hole Creator</h1>
+ * <ol>
+ *     <li>根据窟窿大小，从节点集合中挑选开始节点</li>
+ *     <li>根据窟窿大小，以及窟窿的开始节点，返回窟窿的结束节点</li>
+ *     <li>根据窟窿的第一个和最后一个节点，对节点集合和边集合进行修改，得到带有hole节点的节点集合和边map</li>
+ *     <li>将生成的一行数据存储到DataCollector中</li>
+ * </ol>
  * @author coldilock
  */
 public class HoleCreator {
 
     private static final int MAX_HOLE_SIZE = 5;
 
-    private GraphNode rootNode;
+    /** 完整的节点集合 */
+    private final List<GraphNode> graphNodeList;
 
-    // 完整的节点集合
-    private List<GraphNode> graphNodeList;
+    /** 完整的节点图 */
+    private final Map<String, List<Pair<String, String>>> edgeMap;
 
-    // 完整的节点图
-    private Map<String, List<Pair<String, String>>> edgeMap;
-
-    // 程序依赖图所属文件名
+    /** 程序依赖图所属文件名 */
     private String fileName;
 
-    // 程序以来图所属方法名
+    /** 程序以来图所属方法名 */
     private String methodName;
 
-    public HoleCreator(GraphNode rootNode){
-        this.rootNode = rootNode;
-    }
+    /** 挖掉的窟窿中的节点 */
+    private List<GraphNode> holeNodes;
 
-    public HoleCreator(GraphNode rootNode, List<GraphNode> graphNodeList, Map<String, List<Pair<String, String>>> edgeMap){
-        this.rootNode = rootNode;
+    /** 挖掉的窟窿中的节点的孩子节点 */
+    private List<GraphNode> childNodesOfHoleNodes;
+
+    /** 最终的节点集合：删除窟窿中节点并加入hole节点 */
+    private List<GraphNode> graphNodeListWithHole;
+
+    /** 最终的边map：删除窟窿中节点对应的边并加入包含hole节点的边 **/
+    private Map<String, List<Pair<String, String>>> edgeMapWithHoleNode;
+
+    /** 记录节点id的映射，用于生成文件 **/
+    private Map<String, String> idChangeMap;
+
+    public HoleCreator(List<GraphNode> graphNodeList, Map<String, List<Pair<String, String>>> edgeMap){
         this.graphNodeList = graphNodeList;
         this.edgeMap = edgeMap;
     }
 
-    public HoleCreator(GraphNode rootNode, List<GraphNode> graphNodeList,
+    public HoleCreator(List<GraphNode> graphNodeList,
                        Map<String, List<Pair<String, String>>> edgeMap,
-                       String fileName, String methodName){
-        this.rootNode = rootNode;
+                       String fileName, String methodName) {
         this.graphNodeList = graphNodeList;
         this.edgeMap = edgeMap;
         this.fileName = fileName;
         this.methodName = methodName;
     }
 
-    public void createHoleWithHoleRange() {
-        for(int i = 1; i <= MAX_HOLE_SIZE; i++){
-            markHoleNodeWithHoleSize(i);
-        }
-    }
-
     /**
-     * 挖窟窿时不需要在树上进行操作，可以对GraphNode的list直接进行操作
+     * 1. 挖窟窿
+     * 不需要在树上进行操作，可以对GraphNode的list直接进行操作
      * 并且无需考虑list中node的顺序问题，因为可以根据node.getChildNodes()知道它们之间的关系
-     * @param holeSize
      */
-    public void markHoleNodeWithHoleSize(int holeSize){
-        for(GraphNode beginNode : this.graphNodeList){
-
-            // 被挖去的节点
-            List<GraphNode> holeNodes = new ArrayList<>();
-            // 因为是被挖去节点的孩子，而一同被删除的节点
-            List<GraphNode> childNodesOfHoleNodes = new ArrayList<>();
-            // 当前节点
-            GraphNode currentNode = beginNode;
-            // 结束节点
-            GraphNode endNode = beginNode;
-            // 当前窟窿大小
-            int currentHoleSize = 0;
-
-            // 开始挖窟窿
-            while(currentNode != null && currentHoleSize < holeSize){
-                holeNodes.add(currentNode);
-                currentHoleSize++;
-
-                if(isControlNode(currentNode)){
-                    // 如果是currentNode是控制节点，获取它的内部子节点，加入到要删除的节点集合中
-                    List<GraphNode> realChildNodes = getChildNodesInsideControlNode(currentNode);
-                    childNodesOfHoleNodes.addAll(realChildNodes);
-                }
-                endNode = currentNode;
-                currentNode = currentNode.getNextNode();
+    public void createHole() {
+        for(int holeSize = 1; holeSize <= MAX_HOLE_SIZE; holeSize++){
+            for(GraphNode holeBeginNode : this.graphNodeList){
+                // 2.根据窟窿大小和窟窿中第一个节点，获取窟窿中最后一个节点
+                GraphNode holeEndNode = this.getHoleEndNode(holeSize, holeBeginNode);
+                // 3.根据窟窿的第一个和最后一个节点，对节点集合和边集合进行修改，得到带有hole节点的节点集合和边map
+                this.addHoleNode(holeBeginNode, holeEndNode);
+                // 4.将生成的一行数据存储到DataCollector中
+                this.saveData(holeSize, holeBeginNode);
             }
-
-
-            // 构造数据集
-            createHoleWithHoleSize(holeNodes, childNodesOfHoleNodes, beginNode, endNode, holeSize);
-
         }
-
     }
 
     /**
-     * 根据窟窿中的节点
-     *  删除节点集合中，所有出现在窟窿里的节点
-     *  创建hole节点，添加到节点集合中
-     *  创建新的边map，删除c、d、cd边集合中，所有和窟窿中节点有关联的边，并创建特殊边s集合
-     * @param holeNodes
-     * @param childNodesOfHoleNodes
-     * @param beginNode
-     * @param endNode
-     * @param holeSize
+     * 2. 根据窟窿大小，以及窟窿的开始节点，返回窟窿的结束节点
+     * @param holeSize 窟窿大小
+     * @param holeBeginNode 窟窿开始节点
+     * @return
      */
-    public void createHoleWithHoleSize(List<GraphNode> holeNodes, List<GraphNode> childNodesOfHoleNodes, GraphNode beginNode, GraphNode endNode, int holeSize){
+    public GraphNode getHoleEndNode(int holeSize, GraphNode holeBeginNode){
+        // 被挖去的节点
+        this.holeNodes = new ArrayList<>();
+        // 因为是被挖去节点的孩子，而一同被删除的节点
+        this.childNodesOfHoleNodes = new ArrayList<>();
+        // 当前节点
+        GraphNode currentNode = holeBeginNode;
+        // 结束节点
+        GraphNode holeEndNode = holeBeginNode;
+        // 当前窟窿大小
+        int currentHoleSize = 0;
+
+        // 开始挖窟窿
+        while(currentNode != null && currentHoleSize < holeSize){
+            this.holeNodes.add(currentNode);
+            currentHoleSize++;
+
+            if(isControlNode(currentNode)){
+                // 如果是currentNode是控制节点，获取它的内部子节点，加入到要删除的节点集合中
+                List<GraphNode> realChildNodes = this.getChildNodesInsideControlNode(currentNode);
+                this.childNodesOfHoleNodes.addAll(realChildNodes);
+            }
+            holeEndNode = currentNode;
+            currentNode = currentNode.getNextNode();
+        }
+
+        return holeEndNode;
+    }
+
+    /**
+     * 3. 生成带hole节点的节点集合和边map
+     * - 3.1 创建hole节点，添加到节点集合中；删除节点集合中，所有出现在窟窿里的节点
+     * - 3.2 创建新的边map，删除c、d、cd边集合中，所有和窟窿中节点有关联的边，并创建特殊边s集合
+     * @param holeBeginNode
+     * @param holeEndNode
+     */
+    public void addHoleNode(GraphNode holeBeginNode, GraphNode holeEndNode){
         /*
-         * 1.创建hole节点
+         * 3.1 创建hole节点
          * 删除节点集合中，所有出现在窟窿里的节点
          * 将hole节点插入到新的节点集合中
          */
         // 创建hole节点
         GraphNode holeNode = new GraphNode("Hole", StringUtil.getUuid());
-        holeNode.setParentNode(beginNode.getParentNode());
-        holeNode.setNextNode(endNode.getNextNode());
+        holeNode.setParentNode(holeBeginNode.getParentNode());
+        holeNode.setNextNode(holeEndNode.getNextNode());
         holeNode.setChildNodes(new ArrayList<GraphNode>(){
             {
-                this.add(endNode.getNextNode());
+                this.add(holeEndNode.getNextNode());
             }
         });
 
         // 删除节点集合中，所有出现在窟窿里的节点
-        List<GraphNode> graphNodeListWithHole = new ArrayList<>(graphNodeList);
-        int holeBeginIndex = graphNodeListWithHole.indexOf(beginNode);
+        this.graphNodeListWithHole = new ArrayList<>(graphNodeList);
+        int holeBeginIndex = this.graphNodeListWithHole.indexOf(holeBeginNode);
 
-        graphNodeListWithHole.removeAll(holeNodes);
-        graphNodeListWithHole.removeAll(childNodesOfHoleNodes);
+        this.graphNodeListWithHole.removeAll(this.holeNodes);
+        this.graphNodeListWithHole.removeAll(this.childNodesOfHoleNodes);
 
         // 将hole节点插入到节点集合中
-        graphNodeListWithHole.add(holeBeginIndex, holeNode);
+        this.graphNodeListWithHole.add(holeBeginIndex, holeNode);
 
-        // 获取holeNodes和deletedChildNodesId的id
-        List<String> holeNodesId = holeNodes.stream()
+        // 获取holeNodes和childNodesOfHoleNodes的id
+        List<String> holeNodesId = this.holeNodes.stream()
                 .map(GraphNode::getId).collect(Collectors.toList());
 
-        List<String> deletedChildNodesId = childNodesOfHoleNodes.stream()
+        List<String> childNodesIdOfHoleNodes = this.childNodesOfHoleNodes.stream()
                 .map(GraphNode::getId).collect(Collectors.toList());
 
         /*
-         * 2. 创建新的边map，并创建特殊边s集合
+         * 3.2.1 创建新的边map，并创建特殊边s集合
          */
-        Map<String, List<Pair<String, String>>> edgeMapWithHole = new HashMap<>();
+        this.edgeMapWithHoleNode = new HashMap<>();
 
         List<Pair<String, String>> specialFlowPairs = new ArrayList<>();
 
         // 窟窿中第一个节点的入边
         Pair<String,String> beginEdge = null;
-        if(beginNode.getParentNode() != null){
+        if(holeBeginNode.getParentNode() != null){
             // 获取原始完整的图中，连接窟窿中第一个节点的入边
-            beginEdge = new Pair<>(beginNode.getParentNode().getId(), beginNode.getId());
+            beginEdge = new Pair<>(holeBeginNode.getParentNode().getId(), holeBeginNode.getId());
             // 创建新的连接窟窿的入边，并加入到s集合中
-            Pair<String, String> holeBeginEdge = new Pair<>(beginNode.getParentNode().getId(), holeNode.getId());
+            Pair<String, String> holeBeginEdge = new Pair<>(holeBeginNode.getParentNode().getId(), holeNode.getId());
             specialFlowPairs.add(holeBeginEdge);
         }
 
         // 窟窿中最后一个节点的出边
         Pair<String,String> endEdge = null;
-        if(endNode.getNextNode() != null){
+        if(holeEndNode.getNextNode() != null){
             // 获取原始完整的图中，连接窟窿中最后一个节点的出边
-            endEdge = new Pair<>(endNode.getId(), endNode.getNextNode().getId());
+            endEdge = new Pair<>(holeEndNode.getId(), holeEndNode.getNextNode().getId());
             // 创建新的连接窟窿的出边，并加入到s集合中
-            Pair<String, String> holeEndEdge = new Pair<>(holeNode.getId(), endNode.getNextNode().getId());
+            Pair<String, String> holeEndEdge = new Pair<>(holeNode.getId(), holeEndNode.getNextNode().getId());
             specialFlowPairs.add(holeEndEdge);
         }
-
-        edgeMapWithHole.put("s", specialFlowPairs);
+        this.edgeMapWithHoleNode.put("s", specialFlowPairs);
 
         /*
-         * 3.删除控制流边集合中，所有和窟窿中节点有关联的边
+         * 3.2.2 删除控制流 c边 集合中，所有和窟窿中节点有关联的边
          * 对于c边集合中的每一个Pair(a,b)
          * 如果 holeNodesId.contains(a) && holeNodesId.contains(b)：删除这个Pair
-         * 或者 deletedChildNodesId.contains(a) || deletedChildNodesId.contains(b)：删除这个Pair
-         * 或者 (beginNodeParentId, beginNode)、(endNode, NextNodeOfEndNode)在c边集合中，删除这个Pair
+         * 或者 childNodesIdOfHoleNodes.contains(a) || childNodesIdOfHoleNodes.contains(b)：删除这个Pair
+         * 或者 (beginNodeParentId, holeBeginNode)、(holeEndNode, NextNodeOfEndNode)在c边集合中，删除这个Pair
          */
         Pair<String, String> finalBeginEdge = beginEdge;
         Pair<String, String> finalEndEdge = endEdge;
@@ -183,113 +200,137 @@ public class HoleCreator {
         // 过滤控制流边中，和窟窿中节点相关的边
         List<Pair<String, String>> controlFlowPairs = this.edgeMap.get("c").stream()
                 .filter(edge -> (!holeNodesId.contains(edge.a) || !holeNodesId.contains(edge.b))
-                        && !deletedChildNodesId.contains(edge.a)
-                        && !deletedChildNodesId.contains(edge.b)
+                        && !childNodesIdOfHoleNodes.contains(edge.a)
+                        && !childNodesIdOfHoleNodes.contains(edge.b)
                         && !edge.equals(finalBeginEdge)
                         && !edge.equals(finalEndEdge))
                 .collect(Collectors.toList());
-
-        edgeMapWithHole.put("c", controlFlowPairs);
+        this.edgeMapWithHoleNode.put("c", controlFlowPairs);
 
         /*
-         * 4.删除控制数据流边集合中，所有和窟窿中节点有关联的边
+         * 3.2.3 删除控制数据流 cd边 集合中，所有和窟窿中节点有关联的边
          * 对于cd边集合中的每一个Pair(a,b)
          * 如果 holeNodesId.contains(a) && holeNodesId.contains(b)：删除这个Pair
-         * 或者 deletedChildNodesId.contains(a) || deletedChildNodesId.contains(b)：删除这个Pair
-         * 或者 (beginNodeParentId, beginNode)、(endNode, NextNodeOfEndNode)在c边集合中，删除这个Pair
+         * 或者 childNodesIdOfHoleNodes.contains(a) || childNodesIdOfHoleNodes.contains(b)：删除这个Pair
+         * 或者 (beginNodeParentId, holeBeginNode)、(holeEndNode, NextNodeOfEndNode)在c边集合中，删除这个Pair
          */
         List<Pair<String, String>> controlFlowAndDataFlowPairs = this.edgeMap.get("cd").stream()
                 .filter(edge -> (!holeNodesId.contains(edge.a) || !holeNodesId.contains(edge.b))
-                        && !deletedChildNodesId.contains(edge.a)
-                        && !deletedChildNodesId.contains(edge.b)
+                        && !childNodesIdOfHoleNodes.contains(edge.a)
+                        && !childNodesIdOfHoleNodes.contains(edge.b)
                         && !edge.equals(finalBeginEdge)
                         && !edge.equals(finalEndEdge))
                 .collect(Collectors.toList());
-
-        edgeMapWithHole.put("cd", controlFlowAndDataFlowPairs);
+        this.edgeMapWithHoleNode.put("cd", controlFlowAndDataFlowPairs);
 
         /*
-         * 5.删除数据流边集合中，所有和窟窿中节点有关联的边
+         * 3.2.4 删除数据流 d边 集合中，所有和窟窿中节点有关联的边
          * 对于d边集合中的每一个Pair(a,b)
-         * 如果 holeNodesId.contains(a) || holeNodesId.contains(b) || deletedChildNodesId.contains(a) || deletedChildNodesId.contains(b)
+         * 如果 holeNodesId.contains(a) || holeNodesId.contains(b) || childNodesIdOfHoleNodes.contains(a) || childNodesIdOfHoleNodes.contains(b)
          * 那么删除这个Pair
          */
         List<Pair<String, String>> dataFlowPairs = this.edgeMap.get("d").stream()
-                .filter(pair -> !holeNodesId.contains(pair.a)
-                        && !holeNodesId.contains(pair.b)
-                        && !deletedChildNodesId.contains(pair.a)
-                        && !deletedChildNodesId.contains(pair.b))
+                .filter(edge -> !holeNodesId.contains(edge.a)
+                        && !holeNodesId.contains(edge.b)
+                        && !childNodesIdOfHoleNodes.contains(edge.a)
+                        && !childNodesIdOfHoleNodes.contains(edge.b))
                 .collect(Collectors.toList());
-
-        edgeMapWithHole.put("d", dataFlowPairs);
-
-        /*
-         * 生成单个数据
-         */
-        // 记录Graph Vocab 和 Graph Representation
-        this.getGraphVocabAndRepresentation(graphNodeListWithHole, edgeMapWithHole);
-        // 记录trace
-        DataCollector.traceList.add(this.methodName + " (" + this.fileName + ")");
-        // 记录hole size
-        DataCollector.holeSizeList.add(String.valueOf(holeSize));
-        // 记录beginNode的name，得到prediction
-        DataCollector.singlePredictionList.add(beginNode.getNodeName());
-        // 记录block prediction
-        DataCollector.blockPredictionList.add(this.getBlockPrediction(beginNode, holeNodes, childNodesOfHoleNodes));
+        this.edgeMapWithHoleNode.put("d", dataFlowPairs);
     }
 
     /**
-     * 生成Graph Vocab 和 Graph Representation
-     * @param graphNodeListWithHole
-     * @param edgeMapWithHole
+     * 4.生成一行数据
+     * @param holeSize
+     * @param holeBeginNode
      */
-    public void getGraphVocabAndRepresentation(List<GraphNode> graphNodeListWithHole, Map<String, List<Pair<String, String>>> edgeMapWithHole){
+    public void saveData(int holeSize, GraphNode holeBeginNode){
+        // 4.1 记录Graph Vocab
+        DataCollector.graphVocabList.add(this.getGraphVocab());
+        // 4.2 记录Graph Representation
+        DataCollector.graphReprensentList.add(this.getGraphRepresentation());
+        // 4.3 记录trace
+        DataCollector.traceList.add(this.methodName + " (" + this.fileName + ")");
+        // 4.4 记录hole size
+        DataCollector.holeSizeList.add(String.valueOf(holeSize));
+        // 4.5 记录beginNode的name，得到prediction
+        DataCollector.singlePredictionList.add(holeBeginNode.getNodeName());
+        // 4.6 记录block prediction
+        DataCollector.blockPredictionList.add(this.getBlockPrediction(holeBeginNode));
+        // 4.7 记录variable name
+        DataCollector.variableNameList.add(this.getVariableNames());
+        // 4.8 记录prediction对应的原始语句
+        DataCollector.originalStatementList.add(this.getOriginalStatements(holeBeginNode));
+    }
+
+    /**
+     * 4.1 生成Graph Vocab, 并保存id的映射到idChangeMap
+     */
+    public List<String> getGraphVocab(){
         /*
          * 创建一个旧id到新id的映射
          * 并生成Graph Vocab
          */
-        Map<String, String> idChangeMap = new HashMap<>();
+        this.idChangeMap = new HashMap<>();
         List<String> graphVocab = new ArrayList<>();
 
-        for(int i = 0; i < graphNodeListWithHole.size(); i++){
-            idChangeMap.put(graphNodeListWithHole.get(i).getId(), String.valueOf(i + 1));
-            // sortedGraphNodes.get(i).setId(String.valueOf(i + 1));
-            // id + ":" + '\'' + nodeName + '\'';
-            graphVocab.add((i + 1) + ":" + '\'' + graphNodeListWithHole.get(i).getNodeName() + '\'');
+        for(int i = 0; i < this.graphNodeListWithHole.size(); i++){
+            this.idChangeMap.put(this.graphNodeListWithHole.get(i).getId(), String.valueOf(i + 1));
+            graphVocab.add((i + 1) + ":" + '\'' + this.graphNodeListWithHole.get(i).getNodeName() + '\'');
         }
 
-        DataCollector.graphVocabList.add(graphVocab);
-
-        /*
-         * 生成Graph Representation
-         */
-        List<String> formatEdges = new ArrayList<>();
-
-        formatEdges.addAll(this.changeIdAndGetGraphRepresentation(edgeMapWithHole, idChangeMap, "c"));
-        formatEdges.addAll(this.changeIdAndGetGraphRepresentation(edgeMapWithHole, idChangeMap, "d"));
-        formatEdges.addAll(this.changeIdAndGetGraphRepresentation(edgeMapWithHole, idChangeMap, "cd"));
-        formatEdges.addAll(this.changeIdAndGetGraphRepresentation(edgeMapWithHole, idChangeMap, "s"));
-
-        DataCollector.graphReprensentList.add(formatEdges);
-
+        return graphVocab;
     }
 
     /**
-     * 获取block prediction
-     * @param beginNode
-     * @param holeNodes
-     * @param deletedChildNodes
+     * 4.2 利用idChangeMap生成Graph Representation
+     */
+    public List<String> getGraphRepresentation(){
+
+        List<String> formatEdges = new ArrayList<>();
+
+        formatEdges.addAll(this.changeEdgeId("c", "1"));
+        formatEdges.addAll(this.changeEdgeId("d", "2"));
+        formatEdges.addAll(this.changeEdgeId("cd", "3"));
+        formatEdges.addAll(this.changeEdgeId("s", "4"));
+
+        return formatEdges;
+    }
+
+    /**
+     * 更改节点的id，并生成某种边对应的Graph Representation
+     * @param edgeType c d cd s
+     * @param edgeTypeNum 1 2 3 4
      * @return
      */
-    public String getBlockPrediction(GraphNode beginNode, List<GraphNode> holeNodes, List<GraphNode> deletedChildNodes){
+    public List<String> changeEdgeId(String edgeType, String edgeTypeNum){
+        List<String> formatEdges = new ArrayList<>();
+        for(Pair<String, String> edge : this.edgeMapWithHoleNode.get(edgeType)){
+            String formatEdge = "[" +
+                    this.idChangeMap.get(edge.a) +
+                    "," +
+                    edgeTypeNum +
+                    "," +
+                    this.idChangeMap.get(edge.b) +
+                    "]";
+            formatEdges.add(formatEdge);
+        }
+        return formatEdges;
+    }
+
+    /**
+     * 4.6 获取block prediction
+     * @param holeBeginNode
+     * @return
+     */
+    public String getBlockPrediction(GraphNode holeBeginNode){
 
         // 对beginNode进行深度优先遍历，只保留在holeNodes和deletedChildNodes中的节点, 这些节点作为blockPrediciton
         // 这样可以保证blockPrediciton里的节点都是按深度优先顺序的
-        holeNodes.addAll(deletedChildNodes);
+        this.holeNodes.addAll(this.childNodesOfHoleNodes);
 
         Graph graph = new Graph();
-        List<GraphNode> blockPredictionNodes = graph.getGraphNodesDFS(beginNode);
-        blockPredictionNodes.retainAll(holeNodes);
+        List<GraphNode> blockPredictionNodes = graph.getGraphNodesDFS(holeBeginNode);
+        blockPredictionNodes.retainAll(this.holeNodes);
 
         StringBuilder blockPredicitonStr = new StringBuilder();
         for(GraphNode holeNode : blockPredictionNodes){
@@ -300,44 +341,32 @@ public class HoleCreator {
     }
 
     /**
-     * 更改节点的id，并生成某种边对应的Graph Representation
-     * @param edgeMapWithHole
-     * @param idChangeMap
-     * @param edgeType
+     * 4.7 获取graphNodeListWithHole集合中，所有变量的名字，并分词
      * @return
      */
-    public List<String> changeIdAndGetGraphRepresentation(Map<String, List<Pair<String, String>>> edgeMapWithHole, Map<String, String> idChangeMap, String edgeType){
+    public String getVariableNames() {
 
-        String edgeTypeNum = "";
-        switch (edgeType) {
-            case "c":
-                edgeTypeNum = "1";
-                break;
-            case "d":
-                edgeTypeNum = "2";
-                break;
-            case "cd":
-                edgeTypeNum = "3";
-                break;
-            case "s":
-                edgeTypeNum = "4";
-                break;
-        }
+        List<String> splitVariableNames = this.graphNodeListWithHole.stream()
+                .filter(graphNode -> graphNode.getVarIdentifier() != null && !graphNode.getVarIdentifier().isEmpty())
+                .map(GraphNode::getVarIdentifier)
+                .map(variableName -> StringUtil.getSplitVariableNameList(variableName, FileUtil.gloveVocabList, FileUtil.stopWordsList))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
 
-        // todo: 把edgeMapWithHole、idChangeMap设置为全局变量
-        List<String> formatEdges = new ArrayList<>();
-        for(Pair<String, String> edge : edgeMapWithHole.get(edgeType)){
+        return String.join(" ", splitVariableNames);
+    }
 
-            String formatEdge = "[" +
-                    idChangeMap.get(edge.a) +
-                    "," +
-                    edgeTypeNum +
-                    "," +
-                    idChangeMap.get(edge.b) +
-                    "]";
-            formatEdges.add(formatEdge);
-        }
-        return formatEdges;
+    /**
+     * 4.8 获取prediction对应的原始语句
+     * @param holeBeginNode
+     * @return
+     */
+    public String getOriginalStatements(GraphNode holeBeginNode) {
+//        if(holeBeginNode.getOriginalStatement() != null && !holeBeginNode.getOriginalStatement().isEmpty())
+//            return holeBeginNode.getOriginalStatement();
+//        else
+//            return "";
+        return holeBeginNode.getOriginalStatement();
     }
 
     /**
@@ -384,7 +413,6 @@ public class HoleCreator {
         }
 
         return insideNodes;
-
     }
 
 }

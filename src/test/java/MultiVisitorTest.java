@@ -15,6 +15,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.Pair;
 import util.DataConfig;
+import util.FileUtil;
 import util.GraphvizUtil;
 import util.StringUtil;
 import visitor.TestVisitor;
@@ -38,7 +39,7 @@ public class MultiVisitorTest {
 
     private static String filePath = "src/test/resources/testcase/Task1.java";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         // run(args);
         // using MethodGVisitor
          getControlAndDataFlow();
@@ -83,7 +84,9 @@ public class MultiVisitorTest {
 //        System.out.println(StringUtil.replaceName(str));
     }
 
-    public static void getControlAndDataFlow() throws IOException {
+    public static void getControlAndDataFlow() throws Exception {
+
+        FileUtil.initVocab();
 
         String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
 
@@ -135,8 +138,8 @@ public class MultiVisitorTest {
                     /*
                      * 5. 构造数据集
                      */
-                    HoleCreator holeCreator = new HoleCreator(rootNode, graphNodeList, edgeMap, filePath, method.getNameAsString());
-                    holeCreator.createHoleWithHoleRange();
+                    HoleCreator holeCreator = new HoleCreator(graphNodeList, edgeMap, filePath, method.getNameAsString());
+                    holeCreator.createHole();
                     DataCollector.createDataSet();
 
                 }));

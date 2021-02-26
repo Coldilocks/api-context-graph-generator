@@ -2,12 +2,10 @@ package util;
 
 import edu.stanford.nlp.simple.Sentence;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author coldilock
@@ -15,10 +13,11 @@ import java.util.regex.Pattern;
 public class StringUtil {
 
     public static String getUuid(){
-//        return UUID.randomUUID().toString().replaceAll("-", "");
         Integer orderId = UUID.randomUUID().toString().hashCode();
         orderId = orderId < 0 ? -orderId : orderId; //String.hashCode() 值会为空
         return String.valueOf(orderId);
+
+        // return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
     /**
@@ -94,10 +93,14 @@ public class StringUtil {
         }
     }
 
-
+    /**
+     * 对java变量名进行分割
+     * @param variableName
+     * @param gloveVocabList
+     * @param stopWordsList
+     * @return
+     */
     public static List<String> getSplitVariableNameList(String variableName, List<String> gloveVocabList, List<String> stopWordsList) {
-
-        List<String> finalList = new ArrayList<>();
 
         // 替换数字及[]
         String variableWithoutNumberAndParentheses = removeNumAndParentheses(variableName);
@@ -105,41 +108,12 @@ public class StringUtil {
         // 按'_'和'$'进行split
         List<String> originalList = splitSpecialCharacter(variableWithoutNumberAndParentheses);
 
-        // 按照Camel case进行分词(得到的词用"_"连接，还要再按照"_"进行一次split)
-        List<String> camelCaseSplitList = new ArrayList<>();
-        for (String s : originalList) {
-            String camelCaseSplitString = splitCamel(s);
-            camelCaseSplitList.add(camelCaseSplitString);
-        }
-
-        // 对进行了camel case split后的单词按照'_'进行split
-        List<String> camelCaseFinalList = new ArrayList<>();
-        for (String s : camelCaseSplitList) {
-            List<String> tempList = splitSpecialCharacter(s);
-            camelCaseFinalList.addAll(tempList);
-        }
-
-        // Stemming
-        List<String> stemmingList = new ArrayList<>();
-        for (String s : camelCaseFinalList) {
-            stemmingList.add(getLemma(s));
-        }
-
-        // stop words
-        List<String> filterStopWordsList = new ArrayList<>();
-        for (String s : stemmingList) {
-            if (!stopWordsList.contains(s) && s.length() > 1) {
-                filterStopWordsList.add(s);
-            }
-        }
-
-        // Glove检查
-        for (String s : filterStopWordsList) {
-            if (gloveVocabList.contains(s)) {
-                finalList.add(s);
-            }
-        }
-
-        return finalList;
+        return originalList.stream()
+                .map(StringUtil::splitCamel)   // 按照Camel case进行分词(得到的词用"_"连接，还要再按照"_"进行一次split)
+                .map(StringUtil::splitSpecialCharacter) // 对进行了camel case split后的单词按照'_'进行split
+                .flatMap(Collection::stream)
+                .map(StringUtil::getLemma) // Stemming
+                .filter(s -> !stopWordsList.contains(s) && s.length() > 1 && gloveVocabList.contains(s)) // stop words and Glove检查
+                .collect(Collectors.toList());
     }
 }

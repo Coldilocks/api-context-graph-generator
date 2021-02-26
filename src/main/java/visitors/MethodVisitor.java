@@ -1,6 +1,5 @@
 package visitors;
 
-import com.github.javaparser.ast.Node;
 import entity.Graph;
 import entity.GraphNode;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -9,7 +8,6 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Get;
 import util.StringUtil;
 
 import java.util.ArrayList;

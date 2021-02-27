@@ -15,9 +15,9 @@ public class DataConfig {
     /** JDK Class Vocab */
     public static String JDKCLASS_VOCAB_FILE_PATH;
     /** glove词表 */
-    public static String GLOVE_VOCAB_PATH;
+    public static String GLOVE_VOCAB_PATH = "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/main/resources/vocab/gloveVocab.txt";
     /** 常用停用词表 */
-    public static String STOP_WORDS_PATH;
+    public static String STOP_WORDS_PATH = "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/main/resources/vocab/stopWords.txt";
     /** class_name_map配置文件 */
     public static String CLASS_NAME_MAP_CONFIG_FILE_PATH;
     public static String ANDROID_CLASS_FILE_PATH;

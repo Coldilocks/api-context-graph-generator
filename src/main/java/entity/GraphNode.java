@@ -44,6 +44,14 @@ public class GraphNode implements Cloneable, Serializable {
         this.id = id;
     }
 
+    public GraphNode(String nodeName, String nodeType, String originalStatement, String id){
+        this.childNodes = new ArrayList<>();
+        this.nodeName = nodeName;
+        this.nodeType = nodeType;
+        this.originalStatement = originalStatement;
+        this.id = id;
+    }
+
     public GraphNode(String nodeName, String varIdentifier, String nodeType, String originalStatement, String id){
         this.childNodes = new ArrayList<>();
         this.nodeName = nodeName;
@@ -139,9 +147,19 @@ public class GraphNode implements Cloneable, Serializable {
 
     @Override
     public String toString() {
-        return "GraphNode{" +
-                "nodeName='" + nodeName + '\'' +
-                '}';
+        String result;
+        if(this.varIdentifier != null && !this.varIdentifier.isEmpty()){
+            result = "GraphNode{" +
+                    "nodeName='" + nodeName + '\'' +
+                    "   varName= '" + varIdentifier + '\'' +
+                    '}';
+        } else {
+            result = "GraphNode{" +
+                    "nodeName='" + nodeName + '\'' +
+                    '}';
+        }
+
+        return result;
     }
 
     @Override

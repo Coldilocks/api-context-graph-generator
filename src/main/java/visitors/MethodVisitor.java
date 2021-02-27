@@ -1,6 +1,5 @@
 package visitors;
 
-import com.github.javaparser.ast.Node;
 import entity.Graph;
 import entity.GraphNode;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -9,13 +8,14 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Get;
 import util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <h1>Method Visitor</h1>
+ * visit every statement in a method, then generate an AST for this method
  * @author coldilock
  */
 public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
@@ -876,10 +876,11 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
         }
         currentNodeName.append(methodSignature);
 
-
         if(checkNodeName(currentNodeName.toString())){
             nodeNameList.add(currentNodeName.toString());
-            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "MethodCall", n.toString(), currentNodeId));
+//            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "MethodCall", n.toString(), currentNodeId));
+            // method name will not be recorded
+            graphNodes.add(new GraphNode(currentNodeName.toString(), "MethodCall", n.toString(), currentNodeId));
         }
 
         return graphNodes;

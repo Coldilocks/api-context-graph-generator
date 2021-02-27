@@ -8,6 +8,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * <h1>Graph Creator</h1>
+ * This class includes several useful methods to create graph.
+ *<ul>
+ *     <li>Link separated nodes to create a control flow tree structure when visiting statements</li>
+ *     <li>Maintain a Symbol Table and New Variable Defined In Current Scope List to link dataflow</li>
+ *     <li>Breadth and depth first traversal of the AST, get all nodes inside it</li>
+ *     <li>Get all control flow edges</li>
+ *     <li>Get all c, d and cd edges</li>
+ *</ul>
+ *
  * @author coldilock
  */
 public class Graph {
@@ -76,20 +86,6 @@ public class Graph {
      * @param graphNodeList
      * @return
      */
-//    public GraphNode linkNodesInControlFlow(GraphNode rootNode, List<GraphNode> graphNodeList){
-//        if(graphNodeList == null || Objects.requireNonNull(graphNodeList).size() == 0)
-//            return rootNode;
-//
-//        for(int i = 0; i < graphNodeList.size() - 1; i++){
-//            graphNodeList.get(i).addChildNode(graphNodeList.get(i + 1));
-//            graphNodeList.get(i + 1).setParentNode(graphNodeList.get(i));
-//        }
-//
-//        rootNode.addChildNode(graphNodeList.get(0));
-//        graphNodeList.get(0).setParentNode(rootNode);
-//
-//        return rootNode;
-//    }
     public GraphNode linkNodesInControlFlow(GraphNode rootNode, List<GraphNode> graphNodeList){
         if(graphNodeList == null || Objects.requireNonNull(graphNodeList).size() == 0)
             return rootNode;
@@ -161,10 +157,11 @@ public class Graph {
     public List<Pair<String, String>> getDataFlowPairs(){
         return dataFlowPairs;
     }
+
     /**
      * Breadth-first traversal
-     * @param root
-     * @return
+     * @param root root node of the AST
+     * @return all nodes in the AST
      */
     public List<GraphNode> breadthFirstTraversal(GraphNode root){
 
@@ -188,25 +185,31 @@ public class Graph {
     }
 
     /**
-     * Print node in Depth-first order
-     * @param root
+     * Get nodes in Depth-first order
+     * @param root root node of the AST
      */
-    public void depthFirstTraversal(GraphNode root){
+    public List<GraphNode> getGraphNodesDFS(GraphNode root){
+        List<GraphNode> graphNodeList = new ArrayList<>();
+        depthFirstTraversal(root, graphNodeList);
+        return graphNodeList;
+    }
+
+    public void depthFirstTraversal(GraphNode root, List<GraphNode> graphNodeList){
         if(root == null)
             return;
 
-        System.out.println(root.getNodeInfo());
+//        System.out.println(root.getNodeInfo());
+        graphNodeList.add(root);
 
         for(GraphNode graphNode : CollectionUtils.emptyIfNull(root.getChildNodes())){
-            depthFirstTraversal(graphNode);
+            depthFirstTraversal(graphNode, graphNodeList);
         }
     }
 
     /**
      * Get control flow edge, represented by node pair
-     * <source node, target node>
-     * @param root
-     * @return
+     * @param root root node of the AST
+     * @return all control flow edges, represented by (source node, target node) pair
      */
     public List<Pair<String, String>> getControlFlow(GraphNode root){
 
@@ -220,9 +223,8 @@ public class Graph {
 
     /**
      * Get control flow edge, represented by node pair
-     * <source node, target node>
-     * @param root
-     * @return
+     * @param root root node of the AST
+     * @return all control flow edges, represented by (source node, target node) pair
      */
     @Deprecated
     public List<Pair<String, String>> getControlFlow2(GraphNode root){
@@ -243,8 +245,8 @@ public class Graph {
 
     /**
      * Get data flow edge(d), control flow edge(c), data and control flow edge(cd)
-     * @param root
-     * @return
+     * @param root root node of the AST
+     * @return a map containing c, d, cd edges
      */
     public Map<String, List<Pair<String, String>>> getControlAndDataFlowPairs(GraphNode root){
 

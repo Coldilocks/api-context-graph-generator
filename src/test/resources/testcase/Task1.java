@@ -7,48 +7,48 @@ import java.util.ArrayList;
 
 public class Task1{
 
-//    public void test(String path) throws FileNotFoundException {
-//        File file = new File(path);
-//        file.mkdir();
-//
-//        String test1 = "hello world";
-//
-//        String test2 = null;
-//
-//        String test3;
-//        test3 = null;
-//
-//        String test4 = new String("hello world");
-//
-//        String test5 = test1.toLowerCase();
-//
-//        String test6 = test1.toLowerCase().toUpperCase();
-//
-//        String test7 = Integer.valueOf(test1).toString();
-//
-//        String test8 = test1.substring(test1.indexOf(" "));
-//
-//
-//    }
+    public void firstMethod(String path) throws FileNotFoundException {
+        File file = new File(path);
+        file.mkdir();
 
-//    public void test(){
-//        int a = 0;
-//
-//        switch (a){
-//            case 0:
-//                System.out.println(a);
-//                break;
-//            case 1:
-//                System.out.println("hello world".toString());
-//                break;
-//            default:
-//                System.out.println("hello world".toLowerCase());
-//        }
-//
-//        int b = 0;
-//    }
+        String test1 = "hello world";
 
-    private File file;
+        String test2 = null;
+
+        String test3;
+        test3 = null;
+
+        String test4 = new String("hello world");
+
+        String test5 = test1.toLowerCase();
+
+        String test6 = test1.toLowerCase().toUpperCase();
+
+        String test7 = Integer.valueOf(test1).toString();
+
+        String test8 = test1.substring(test1.indexOf(" "));
+
+
+    }
+
+    public void secondMethod(){
+        int a = 0;
+
+        switch (a){
+            case 0:
+                System.out.println(a);
+                break;
+            case 1:
+                System.out.println("hello world".toString());
+                break;
+            default:
+                System.out.println("hello world".toLowerCase());
+        }
+
+        int b = 0;
+    }
+
+//    private File file;
 
     public void readContentFromFile(String path) throws FileNotFoundException {
 //        StringBuilder str = new StringBuilder("text".toString());

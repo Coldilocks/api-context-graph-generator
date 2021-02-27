@@ -16,6 +16,42 @@ public class FileUtil {
     public static List<String> gloveVocabList;
     public static List<String> stopWordsList;
 
+    public static void saveStringInFile(String str, FileWriter writer){
+        try{
+            writer.write(str + "\r\n");
+            writer.flush();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void save2dListFileWithoutClose(List<List<String>> data, FileWriter writer){
+        try{
+//            File file = new File(filePath);
+//            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+
+            for(List<String> list : data){
+                writer.write(list.toString() + "\r\n");
+            }
+            writer.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveListFileWithoutClose(List<String> data, FileWriter writer){
+        try{
+//            File file = new File(filePath);
+//            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+            for(String str : data){
+                writer.write(str + "\r\n");
+            }
+            writer.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void save2dListFile(List<List<String>> data, String filePath){
         try{
             File file = new File(filePath);

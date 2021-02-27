@@ -260,6 +260,8 @@ public class HoleCreator {
         DataCollector.variableNameList.add(this.getVariableNames());
         // 4.8 记录prediction对应的原始语句
         DataCollector.originalStatementList.add(this.getOriginalStatements(holeBeginNode));
+        // 4.9 记录分词后的method name
+        DataCollector.methodNameList.add(this.getMethodNames());
     }
 
     /**
@@ -367,6 +369,15 @@ public class HoleCreator {
 //        else
 //            return "";
         return holeBeginNode.getOriginalStatement();
+    }
+
+    /**
+     * 4.9 获取分词后的方法名
+     * @return
+     */
+    public String getMethodNames(){
+        List<String> splitMethodNames = StringUtil.getSplitVariableNameList(this.methodName, FileUtil.gloveVocabList, FileUtil.stopWordsList);
+        return String.join(" ", splitMethodNames);
     }
 
     /**

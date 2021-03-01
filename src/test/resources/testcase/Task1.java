@@ -7,6 +7,11 @@ import java.util.ArrayList;
 
 public class Task1{
 
+//    public void test1(){
+//        System.out.println("hello world");
+//        PrintStream out = System.out;
+//    }
+
     public void firstMethod(String path) throws FileNotFoundException {
         File file = new File(path);
         file.mkdir();
@@ -22,11 +27,11 @@ public class Task1{
 
         String test5 = test1.toLowerCase();
 
-        String test6 = test1.toLowerCase().toUpperCase();
+        String test6 = test2.toLowerCase().toUpperCase();
 
-        String test7 = Integer.valueOf(test1).toString();
+        String test7 = Integer.valueOf(test3).toString();
 
-        String test8 = test1.substring(test1.indexOf(" "));
+        String test8 = test1.substring(test4.indexOf(" "));
 
 
     }

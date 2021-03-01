@@ -1,5 +1,6 @@
 package visitors;
 
+import com.github.javaparser.ParseException;
 import entity.Graph;
 import entity.GraphNode;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -18,7 +19,7 @@ import java.util.List;
  * visit every statement in a method, then generate an AST for this method
  * @author coldilock
  */
-public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
+public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> {
 
     /** A util to create graph */
     public Graph graph;
@@ -195,7 +196,7 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode doWhileNode = new GraphNode("doWhile", StringUtil.getUuid());
+        GraphNode doWhileNode = new GraphNode("Do While", StringUtil.getUuid());
 
         // examine the condition expression and get condition node
         GraphNode conditionNode = new GraphNode("Condition", StringUtil.getUuid());
@@ -370,7 +371,12 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
         // examine statements inside every case (SwitchEntry in JavaParser)
         n.getEntries().forEach(switchEntry -> {
-            GraphNode caseNode = new GraphNode("Case", StringUtil.getUuid());
+            String caseOrDefaultLabel = "";
+            if(switchEntry.toString().startsWith("default:") || switchEntry.toString().startsWith("default :"))
+                caseOrDefaultLabel = "Default";
+            else
+                caseOrDefaultLabel = "Case";
+            GraphNode caseNode = new GraphNode(caseOrDefaultLabel, StringUtil.getUuid());
             List<GraphNode> caseChildNodes = switchEntry.accept(this, nodeId);
             if(caseChildNodes != null){
                 caseNode = graph.linkNodesInControlFlow(caseNode, caseChildNodes);
@@ -1019,8 +1025,45 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(FieldAccessExpr n, String nodeId) {
-        super.visit(n, nodeId);
+//        super.visit(n, nodeId);
+//        List<GraphNode> graphNodes = new ArrayList<>();
+//        return graphNodes;
+
         List<GraphNode> graphNodes = new ArrayList<>();
+
+        /*
+         * 'System.out.println("something")' -> System.out.println() is the parent node of System.out in JavaParser
+         * We won't create a node for System.out in this case for our API graph.
+         */
+        if(n.getParentNode().isPresent()){
+            try{
+                MethodCallExpr m = (MethodCallExpr) n.getParentNode().get();
+                return graphNodes;
+            } catch (ClassCastException ignored){
+            }
+        }
+
+        String currentNodeId = StringUtil.getUuid();
+
+        List<GraphNode> childNodes = super.visit(n, currentNodeId);
+        if(childNodes != null){
+            graphNodes.addAll(childNodes);
+        }
+
+        StringBuilder currentNodeName = new StringBuilder();
+        String filedName;
+        try{
+            filedName = n.resolve().getType().describe();
+        } catch (UnsolvedSymbolException e){
+            filedName = "UnsolvedType.unsolvedField";
+        }
+        currentNodeName.append(filedName);
+
+        if(checkNodeName(currentNodeName.toString())){
+            nodeNameList.add(currentNodeName.toString());
+            graphNodes.add(new GraphNode(currentNodeName.toString(), "FieldAccess", n.toString(), currentNodeId));
+        }
+
         return graphNodes;
     }
 

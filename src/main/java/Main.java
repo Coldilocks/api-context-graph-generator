@@ -10,9 +10,12 @@ import dataset.HoleCreator;
 import entity.Graph;
 import entity.GraphNode;
 import util.FileUtil;
+import util.GraphvizUtil;
+import util.StringUtil;
 import visitors.MethodVisitor;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +42,10 @@ public class Main {
     }
 
     public static void getControlAndDataFlow(String filePath) throws Exception {
+
+        boolean isCreateGraph = true;
+        boolean isCreateDataset = false;
+
         String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
 
         CombinedTypeSolver typeSolver = new CombinedTypeSolver();
@@ -83,19 +90,23 @@ public class Main {
                      */
                     Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
 
-//                    try {
-//                        GraphvizUtil.createGraphWithColor("/Users/coldilock/Downloads/output/" + StringUtil.getUuid() +".dot", graphNodeList, edgeMap);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
+                    if(isCreateGraph){
+                        try {
+                            GraphvizUtil.createGraphWithColor("/Users/coldilock/Downloads/output/graph/" + StringUtil.getUuid() +".dot", graphNodeList, edgeMap);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
                     /*
                      * 5. make hole and create dataset
                      */
-                    HoleCreator holeCreator = new HoleCreator(graphNodeList, edgeMap, filePath, method.getNameAsString());
-                    holeCreator.createHole();
-                    // DataCollector.createDataSet();
-                    DataCollector.saveCurrentData();
+                    if(isCreateDataset){
+                        HoleCreator holeCreator = new HoleCreator(graphNodeList, edgeMap, filePath, method.getNameAsString());
+                        holeCreator.createHole();
+                        // DataCollector.createDataSet();
+                        DataCollector.saveCurrentData();
+                    }
                 }));
     }
 }

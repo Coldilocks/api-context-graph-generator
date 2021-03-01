@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  *
  * @author Julio Vilmar Gesser
  */
-public abstract class GenericVisitorAdapter<R, A> implements GenericVisitor<List<R>, A> {
+public abstract class GenericVisitorAdapterLite<R, A> implements GenericVisitor<List<R>, A> {
 
     public List<R> visit(final AnnotationDeclaration n, final A arg) {
         List<R> result = new ArrayList<>();

@@ -140,7 +140,7 @@ public class MultiVisitorTest {
                      */
                     HoleCreator holeCreator = new HoleCreator(graphNodeList, edgeMap, filePath, method.getNameAsString());
                     holeCreator.createHole();
-                    DataCollector.createDataSet();
+//                    DataCollector.createDataSet();
 
                 }));
 

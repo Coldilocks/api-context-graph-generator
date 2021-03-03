@@ -1,5 +1,6 @@
 package dataset;
 
+import util.DataConfig;
 import util.FileUtil;
 
 import java.io.*;
@@ -34,7 +35,7 @@ public class DataCollector {
     public static List<String> methodNameList = new ArrayList<>();
 
     public static void createWriters() throws IOException {
-        String fileFolder = "/Users/coldilock/Downloads/output/";
+        String fileFolder = DataConfig.OUTPUT_PATH;
 
         graphVocabWriter = new FileWriter(fileFolder + "graph_vocab.txt", true);
         graphReprensentWriter = new FileWriter(fileFolder + "graph_reprensent.txt", true);
@@ -85,18 +86,5 @@ public class DataCollector {
         variableNameWriter.close();
         originalStatementWriter.close();
         methodNameWriter.close();
-    }
-
-    public static void createDataSet(){
-        String fileFolder = "/Users/coldilock/Downloads/output/";
-        FileUtil.save2dListFile(graphVocabList, fileFolder + "graph_vocab.txt");
-        FileUtil.save2dListFile(graphReprensentList, fileFolder + "graph_reprensent.txt");
-        FileUtil.saveListFile(traceList, fileFolder + "trace.txt");
-        FileUtil.saveListFile(singlePredictionList, fileFolder + "single_prediction.txt");
-        FileUtil.saveListFile(blockPredictionList, fileFolder + "block_prediction.txt");
-        FileUtil.saveListFile(holeSizeList, fileFolder + "hole_size.txt");
-        FileUtil.saveListFile(variableNameList, fileFolder + "variable_names.txt");
-        FileUtil.saveListFile(originalStatementList, fileFolder + "original_statement.txt");
-        FileUtil.saveListFile(methodNameList, fileFolder + "method_names.txt");
     }
 }

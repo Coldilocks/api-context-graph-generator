@@ -18,7 +18,7 @@ import java.util.List;
  * visit every statement in a method, then generate an AST for this method
  * @author coldilock
  */
-public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
+public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> {
 
     /** A util to create graph */
     public Graph graph;
@@ -26,6 +26,7 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
     public List<String> nodeNameList = new ArrayList<>();
 
     private boolean checkNodeName(String str){
+//        return !str.isEmpty() && !str.startsWith(".") && !str.startsWith("UnsolvedType.");
         return !str.isEmpty() && !str.startsWith(".");
     }
 
@@ -46,13 +47,25 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
             graph.jumpOutOfScope();
         });
 
-        GraphNode rootNode = new GraphNode("Root", StringUtil.getUuid());
-        rootNode = graph.linkNodesInControlFlow(rootNode, graphNodes);
+        // No Root Node in the final graph
+        // GraphNode rootNode = new GraphNode("Root", StringUtil.getUuid());
+        // rootNode = graph.linkNodesInControlFlow(rootNode, graphNodes);
+        // List<GraphNode> graphResult = new ArrayList<>();
+        // graphResult.add(rootNode);
+        // return graphResult;
 
         List<GraphNode> graphResult = new ArrayList<>();
-        graphResult.add(rootNode);
-        return graphResult;
 
+        GraphNode rootNode;
+
+        List<GraphNode> graphNodesWithoutRootNode = new ArrayList<>(graphNodes);
+        if(graphNodes.size() > 0 && graphNodesWithoutRootNode.size() > 0){
+            graphNodesWithoutRootNode.remove(0);
+            rootNode = graph.linkNodesInControlFlow(graphNodes.get(0), graphNodesWithoutRootNode);
+            graphResult.add(rootNode);
+        }
+
+        return graphResult;
     }
 
     @Override
@@ -195,7 +208,7 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
         List<GraphNode> graphNodes = new ArrayList<>();
 
-        GraphNode doWhileNode = new GraphNode("doWhile", StringUtil.getUuid());
+        GraphNode doWhileNode = new GraphNode("Do While", StringUtil.getUuid());
 
         // examine the condition expression and get condition node
         GraphNode conditionNode = new GraphNode("Condition", StringUtil.getUuid());
@@ -370,7 +383,12 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
         // examine statements inside every case (SwitchEntry in JavaParser)
         n.getEntries().forEach(switchEntry -> {
-            GraphNode caseNode = new GraphNode("Case", StringUtil.getUuid());
+            String caseOrDefaultLabel = "";
+            if(switchEntry.toString().startsWith("default:") || switchEntry.toString().startsWith("default :"))
+                caseOrDefaultLabel = "Default";
+            else
+                caseOrDefaultLabel = "Case";
+            GraphNode caseNode = new GraphNode(caseOrDefaultLabel, StringUtil.getUuid());
             List<GraphNode> caseChildNodes = switchEntry.accept(this, nodeId);
             if(caseChildNodes != null){
                 caseNode = graph.linkNodesInControlFlow(caseNode, caseChildNodes);
@@ -733,10 +751,18 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
         String typeName;
         try{
             typeName = n.resolve().getType().describe();
+        } catch (UnsolvedSymbolException e){
+            typeName = "UnsolvedType.UnsolvedSymbolException.In.VariableDeclarator.varType";
+        } catch (RuntimeException e){
+            typeName = "UnsolvedType.RuntimeException.In.VariableDeclarator.varType";
         } catch (Exception e){
-            typeName = "UnreslovedTypeX";
+            typeName = "UnsolvedType.In.VariableDeclarator.varType";
         }
         currentNodeName.append(typeName);
+
+        // unsolved type variable will not be recorded
+        if(!checkNodeName(typeName))
+            return graphNodes;
 
         /*
          * CREATE node for initializer-ABSENT VariableDeclarator
@@ -808,7 +834,11 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
             objCreationName = n.resolve().getQualifiedSignature();
             // currentNodeName.append(".").append("new").append("(").append(objCreationName, objCreationName.indexOf("(") + 1, objCreationName.indexOf(")") + 1 );
         } catch (UnsolvedSymbolException e){
-            objCreationName = "UnresolvableType.new()";
+            objCreationName = "UnsolvedType.UnsolvedSymbolException.In.ObjectCreationExpr.new()";
+        } catch (RuntimeException e){
+            objCreationName = "UnsolvedType.RuntimeException.In.ObjectCreationExpr.new()";
+        } catch (Exception e){
+            objCreationName = "UnsolvedType.In.ObjectCreationExpr.new()";
         }
         currentNodeName.append(objCreationName);
         nodeNameList.add(currentNodeName.toString());
@@ -817,7 +847,7 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
             String originalStmt = n.getParentNode().get().toString();
 
-            String varIdentifier = "unknown";
+            String varIdentifier = null;
 
             // parentNode could be VariableDeclarator or AssignExpr
             try{
@@ -830,11 +860,15 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
             } catch (ClassCastException ignored){
             }
 
-            graphNodes.add(new GraphNode(StringUtil.replaceName(currentNodeName.toString()), varIdentifier, "ObjCreation", originalStmt, currentNodeId));
+            if(varIdentifier != null){
+                graphNodes.add(new GraphNode(StringUtil.replaceName(currentNodeName.toString()), varIdentifier, "ObjCreation", originalStmt, currentNodeId));
+            } else {
+                graphNodes.add(new GraphNode(StringUtil.replaceName(currentNodeName.toString()), "ObjCreation", originalStmt, currentNodeId));
+            }
 
         } else {
             // e.g. 'new File();'
-            graphNodes.add(new GraphNode(StringUtil.replaceName(currentNodeName.toString()), "unknown", "ObjCreation", n.toString(), currentNodeId));
+            graphNodes.add(new GraphNode(StringUtil.replaceName(currentNodeName.toString()), "ObjCreation", n.toString(), currentNodeId));
         }
 
         return graphNodes;
@@ -872,7 +906,11 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
         try{
             methodSignature = n.resolve().getQualifiedSignature();
         } catch (UnsolvedSymbolException e){
-            methodSignature = "UnsolvedType.unsolvedMethod()";
+            methodSignature = "UnsolvedType.UnsolvedSymbolException.In.MethodCallExpr.method()";
+        } catch (RuntimeException e){
+            methodSignature = "UnsolvedType.RuntimeException.In.MethodCallExpr.method()";
+        } catch (Exception e){
+            methodSignature = "UnsolvedType.In.MethodCallExpr.method()";
         }
         currentNodeName.append(methodSignature);
 
@@ -949,8 +987,8 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(IntegerLiteralExpr n, String nodeId) {
-        List<GraphNode> graphNodes = new ArrayList<>();
         super.visit(n, nodeId);
+        List<GraphNode> graphNodes = new ArrayList<>();
         return graphNodes;
     }
 
@@ -1019,8 +1057,54 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(FieldAccessExpr n, String nodeId) {
-        super.visit(n, nodeId);
+//        super.visit(n, nodeId);
+//        List<GraphNode> graphNodes = new ArrayList<>();
+//        return graphNodes;
+
         List<GraphNode> graphNodes = new ArrayList<>();
+
+        // fieldAccess like "this.xxx" will not be recorded
+        if(n.getScope().isThisExpr()){
+            return graphNodes;
+        }
+
+        /*
+         * 'System.out.println("something")' -> System.out.println() is the parent node of System.out in JavaParser
+         * We won't create a node for System.out in this case for our API graph.
+         */
+        if(n.getParentNode().isPresent()){
+            try{
+                MethodCallExpr m = (MethodCallExpr) n.getParentNode().get();
+                return graphNodes;
+            } catch (ClassCastException ignored){
+            }
+        }
+
+        String currentNodeId = StringUtil.getUuid();
+
+        List<GraphNode> childNodes = super.visit(n, currentNodeId);
+        if(childNodes != null){
+            graphNodes.addAll(childNodes);
+        }
+
+        StringBuilder currentNodeName = new StringBuilder();
+        String filedName;
+        try{
+            filedName = n.resolve().getType().describe();
+        } catch (UnsolvedSymbolException e){
+            filedName = "UnsolvedType.UnsolvedSymbolException.In.FieldAccessExpr.fieldType";
+        } catch (RuntimeException e){
+            filedName = "UnsolvedType.RuntimeException.In.FieldAccessExpr.fieldType";
+        } catch (Exception e){
+            filedName = "UnsolvedType.In.FieldAccessExpr.fieldType";
+        }
+        currentNodeName.append(filedName);
+
+        if(checkNodeName(currentNodeName.toString())){
+            nodeNameList.add(currentNodeName.toString());
+            graphNodes.add(new GraphNode(currentNodeName.toString(), "FieldAccess", n.toString(), currentNodeId));
+        }
+
         return graphNodes;
     }
 
@@ -1084,11 +1168,20 @@ public class MethodVisitor extends GenericVisitorAdapter<GraphNode, String> {
 
     @Override
     public List<GraphNode> visit(LambdaExpr n, String nodeId) {
-        super.visit(n, nodeId);
         List<GraphNode> graphNodes = new ArrayList<>();
+        List<GraphNode> childNodes = super.visit(n, nodeId);
+        if(childNodes != null){
+            graphNodes.addAll(childNodes);
+        }
         return graphNodes;
     }
 
+    /**
+     * todo: method reference
+     * @param n
+     * @param nodeId
+     * @return
+     */
     @Override
     public List<GraphNode> visit(MethodReferenceExpr n, String nodeId) {
         super.visit(n, nodeId);

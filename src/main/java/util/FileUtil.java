@@ -3,9 +3,11 @@ package util;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -106,5 +108,57 @@ public class FileUtil {
     public static void initVocab() throws Exception {
         gloveVocabList = FileUtil.readFile2List(DataConfig.GLOVE_VOCAB_PATH);
         stopWordsList = FileUtil.readFile2List(DataConfig.STOP_WORDS_PATH);
+    }
+
+    /**
+     * 获取一个目录下所有项目的绝对路径
+     * @param filePath
+     * @return
+     */
+    public static List<String> getProjectRootPathList(String filePath) {
+        List<String> projectRootPathList = new ArrayList<>();
+
+        File file = new File(filePath);
+        File[] fs = file.listFiles();
+        for(File f: fs) {
+            if(f.isDirectory() && f.listFiles()!=null) {
+                projectRootPathList.add(f.getPath());
+            }
+        }
+
+        return projectRootPathList;
+    }
+
+    /**
+     * 获取一个文件夹中所有的java文件
+     * @param file 根目录
+     * @param files 存储java文件路径的list
+     */
+    public static void getAllJavaFileList(File file, List<String> files) {
+        if(file.isDirectory() && file.listFiles() != null){
+            File[] fs = file.listFiles();
+            for (File f : fs){
+                getAllJavaFileList(f, files);
+            }
+        } else if(file.isFile() && file.getPath().endsWith(".java")){
+            files.add(file.getPath());
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        String projectsDirectory = "/Users/coldilock/Downloads/JavaCodeCorpus/methoc call dataset/big projects";
+        String outputPath = "/Users/coldilock/Downloads/file_list.txt";
+
+        List<String> allJavaFilePathList = new ArrayList<>();
+
+        List<String> projectRootPathList = getProjectRootPathList(projectsDirectory);
+        for(String projectRootPath : projectRootPathList){
+            List<String> javaFileList = new ArrayList<>();
+            getAllJavaFileList(new File(projectRootPath), javaFileList);
+            allJavaFilePathList.addAll(javaFileList);
+        }
+
+        saveListFile(allJavaFilePathList, outputPath);
     }
 }

@@ -17,6 +17,7 @@ import visitors.MethodVisitor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,12 +28,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Main {
 
     private static boolean isCreateGraph = false;
-    private static boolean isCreateDataset = false;
+    private static boolean isCreateDataset = true;
 
     private static boolean checkJdkAPI = true;
     private static boolean checkThirdPartyAPI = true;
     private static boolean checkUserDefinedAPI = true;
-
 
     public static void main(String[] args) throws Exception {
 
@@ -48,7 +48,6 @@ public class Main {
             createDataset(DataConfig.JAVA_FILE_PATH);
             DataCollector.closeWriters();
         }
-
     }
 
     public static void createDataset(String fileListPath) throws Exception {
@@ -61,28 +60,38 @@ public class Main {
 
     public static void getControlAndDataFlow(String filePath) throws Exception {
 
-        String jarFile = "/Users/coldilock/Downloads/javaparser-core-3.16.1.jar";
-        String secondJarFile = "/Users/coldilock/.m2/repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar";
-
-        String projectSrcPath = "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/main/java";
-
         CombinedTypeSolver typeSolver = new CombinedTypeSolver();
 
-        if(checkJdkAPI)
+        // solve qualified name from jdk api
+        if(checkJdkAPI){
             typeSolver.add(new ReflectionTypeSolver());
-        if(checkThirdPartyAPI){
-            typeSolver.add(JarTypeSolver.getJarTypeSolver(jarFile));
-            typeSolver.add(JarTypeSolver.getJarTypeSolver(secondJarFile));
         }
+        // solve qualified name from third party api
+        if(checkThirdPartyAPI){
+            // add the jar file path
+            String firstJarFile = "src/main/resources/input/jarfiles/javaparser-core-3.16.1.jar";
+            String secondJarFile = "src/main/resources/input/jarfiles/commons-collections4-4.4.jar";
 
-        if(checkUserDefinedAPI)
+            List<String> jarFileList = new ArrayList<>();
+            jarFileList.add(firstJarFile);
+            jarFileList.add(secondJarFile);
+
+            for(String jarFilePath : jarFileList){
+                typeSolver.add(JarTypeSolver.getJarTypeSolver(jarFilePath));
+            }
+        }
+        // solve qualified name from user-defined class and method
+        if(checkUserDefinedAPI){
+            // add the source root path of filePath
+            String projectSrcPath = "src/main/java";
+
             typeSolver.add(new JavaParserTypeSolver(new File(projectSrcPath)));
+        }
 
         JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
         StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
 
         CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
-
 
         cu.getTypes().forEach(type -> {
 
@@ -101,26 +110,16 @@ public class Main {
                 if(graphNodes == null || graphNodes.isEmpty())
                     return;
 
-                /*
-                 * 1. Get root node
-                 */
+                // 1. Get root node
                 GraphNode rootNode = graphNodes.get(0);
-                // graph.depthFirstTraversal(rootNode);
 
-                /*
-                 * 2. Get nodes in depth-first order
-                 */
-                // graph.breadthFirstTraversal(rootNode).forEach(node -> System.out.println(node.getNodeInfo()));
+                // 2. Get nodes in depth-first order
                 List<GraphNode> graphNodeList = graph.getGraphNodesDFS(rootNode);
 
-                /*
-                 * 3. Print all node names
-                 */
+                // 3. Print all node names
                 // graphNodeList.forEach(graphNode -> System.out.println(graphNode.getNodeName()));
 
-                /*
-                 * 4. Get data and control flow edge, and create a graph
-                 */
+                // 4. Get data and control flow edge, and create a graph
                 Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
 
                 if(isCreateGraph){
@@ -131,13 +130,10 @@ public class Main {
                     }
                 }
 
-                /*
-                 * 5. make hole and create dataset
-                 */
+                // 5. make hole and create dataset
                 if(isCreateDataset){
                     HoleCreator holeCreator = new HoleCreator(graphNodeList, edgeMap, filePath, method.getNameAsString());
                     holeCreator.createHole();
-                    // DataCollector.createDataSet();
                     DataCollector.saveCurrentData();
                 }
 

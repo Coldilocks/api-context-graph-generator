@@ -114,6 +114,7 @@ public class StringUtil {
                 .flatMap(Collection::stream)
                 .map(StringUtil::getLemma) // Stemming
                 .filter(s -> !stopWordsList.contains(s) && s.length() > 1 && gloveVocabList.contains(s)) // stop words and Glove检查
+                .distinct() // 去除重复值
                 .collect(Collectors.toList());
     }
 }

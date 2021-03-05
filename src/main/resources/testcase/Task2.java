@@ -9,10 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author coldilock
- */
-public class Test {
+public class Test2 {
     /**
      * get import list with or without asterisk
      * @throws FileNotFoundException

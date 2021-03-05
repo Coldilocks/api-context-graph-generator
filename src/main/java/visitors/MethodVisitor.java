@@ -23,11 +23,8 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
     /** A util to create graph */
     public Graph graph;
 
-    public List<String> nodeNameList = new ArrayList<>();
-
     private boolean checkNodeName(String str){
-//        return !str.isEmpty() && !str.startsWith(".") && !str.startsWith("UnsolvedType.");
-        return !str.isEmpty() && !str.startsWith(".");
+        return !str.isEmpty() && !str.startsWith(".") && !str.startsWith("UnsolvedType.");
     }
 
     public MethodVisitor(Graph graph){
@@ -48,12 +45,6 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
         });
 
         // No Root Node in the final graph
-        // GraphNode rootNode = new GraphNode("Root", StringUtil.getUuid());
-        // rootNode = graph.linkNodesInControlFlow(rootNode, graphNodes);
-        // List<GraphNode> graphResult = new ArrayList<>();
-        // graphResult.add(rootNode);
-        // return graphResult;
-
         List<GraphNode> graphResult = new ArrayList<>();
 
         GraphNode rootNode;
@@ -771,7 +762,6 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
         if(!n.getInitializer().isPresent()){
             currentNodeName.append(".").append("Declaration");
             graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), currentNodeId));
-            nodeNameList.add(currentNodeName.toString());
             graph.addNewVarInCurrentScope(n.getNameAsString(), currentNodeId);
         }
 
@@ -786,12 +776,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             if(init.isLiteralExpr() && !init.isNullLiteralExpr() && !init.isTextBlockLiteralExpr()){
                 currentNodeName.append(".").append("Constant");
                 graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), currentNodeId));
-                nodeNameList.add(currentNodeName.toString());
                 graph.addNewVarInCurrentScope(n.getNameAsString(), currentNodeId);
             } else if(init.isNullLiteralExpr()){
-                currentNodeName.append(".").append("Declaration").append(".").append("NULL");
+                currentNodeName.append(".").append("Declaration").append(".").append("Null");
                 graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), currentNodeId));
-                nodeNameList.add(currentNodeName.toString());
                 graph.addNewVarInCurrentScope(n.getNameAsString(), currentNodeId);
             } else if((init.isMethodCallExpr() || init.isObjectCreationExpr()) && childNodes.size() > 0){
                 /*
@@ -841,7 +829,6 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             objCreationName = "UnsolvedType.In.ObjectCreationExpr.new()";
         }
         currentNodeName.append(objCreationName);
-        nodeNameList.add(currentNodeName.toString());
 
         if(n.getParentNode().isPresent()){
 
@@ -915,7 +902,6 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
         currentNodeName.append(methodSignature);
 
         if(checkNodeName(currentNodeName.toString())){
-            nodeNameList.add(currentNodeName.toString());
 //            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "MethodCall", n.toString(), currentNodeId));
             // method name will not be recorded
             graphNodes.add(new GraphNode(currentNodeName.toString(), "MethodCall", n.toString(), currentNodeId));
@@ -1101,7 +1087,6 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
         currentNodeName.append(filedName);
 
         if(checkNodeName(currentNodeName.toString())){
-            nodeNameList.add(currentNodeName.toString());
             graphNodes.add(new GraphNode(currentNodeName.toString(), "FieldAccess", n.toString(), currentNodeId));
         }
 

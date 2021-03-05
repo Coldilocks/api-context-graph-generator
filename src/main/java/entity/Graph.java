@@ -198,7 +198,6 @@ public class Graph {
         if(root == null)
             return;
 
-//        System.out.println(root.getNodeInfo());
         graphNodeList.add(root);
 
         for(GraphNode graphNode : CollectionUtils.emptyIfNull(root.getChildNodes())){

@@ -17,22 +17,31 @@ import java.util.Map;
  * @author coldilock
  */
 public class GraphvizUtil {
+
+    public static void main(String[] args) throws IOException {
+        createDotFile("/Users/coldilock/Documents/Code/Github/CodeRecPro/src/test/resources/testcase/Task1.java", "/Users/coldilock/Downloads/test.dot");
+    }
+//    public static void createDotFile(String inputPath, String outputPath) throws IOException {
+//        CompilationUnit cu = StaticJavaParser.parse(new File(inputPath));
+//
+//        DotPrinter printer = new DotPrinter(true);
+//        try (FileWriter fileWriter = new FileWriter(outputPath);
+//             PrintWriter printWriter = new PrintWriter(fileWriter)) {
+//                cu.getTypes().forEach(
+//                        type -> type.getMethods().forEach(
+//                                method -> method.getBody().ifPresent(
+//                                        m -> printWriter.print(printer.output(m)))));
+//        }
+//    }
+
     public static void createDotFile(String inputPath, String outputPath) throws IOException {
         CompilationUnit cu = StaticJavaParser.parse(new File(inputPath));
 
         DotPrinter printer = new DotPrinter(true);
         try (FileWriter fileWriter = new FileWriter(outputPath);
              PrintWriter printWriter = new PrintWriter(fileWriter)) {
-//            printWriter.print(printer.output(cu));
-
-            cu.getTypes().forEach(type ->
-                    type.getMethods().forEach(method -> {
-                            method.getBody().ifPresent(m -> printWriter.print(printer.output(m)));
-                        }
-
-                    )
-            );
-
+            cu.getTypes().forEach(
+                    type -> type.getMethods().forEach(method->printWriter.print(printer.output(method))));
         }
     }
 
@@ -99,9 +108,6 @@ public class GraphvizUtil {
         }
 
         finalResult.append(header).append(nodesInResult).append(cEdgesInResult).append(dEdgesInResult).append(cdEdgesInResult).append("}");
-
-//        finalResult.append(header).append(nodesInResult).append(edgesInResult).append("}");
-
 
         out.print(finalResult);
         out.flush();

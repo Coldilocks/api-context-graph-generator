@@ -17,11 +17,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * A visitor that has a return value (R), and has a default implementation for all its visit
- * methods that visits their children in an unspecified order, and the first visit method
- * that returns a value will stop the visitation and be the end result.
- *
- * @author Julio Vilmar Gesser
+ * A visitor that has a return value of ({@link List List<R>}), and has a default implementation for all its visit
+ * methods that visits their children in an unspecified order, and all visit methods
+ * that returns a value be added to a flattened {@link List List<R>}.
  */
 public abstract class GenericVisitorAdapterLite<R, A> implements GenericVisitor<List<R>, A> {
 

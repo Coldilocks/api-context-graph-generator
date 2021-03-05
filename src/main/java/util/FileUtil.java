@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -29,11 +28,9 @@ public class FileUtil {
 
     public static void save2dListFileWithoutClose(List<List<String>> data, FileWriter writer){
         try{
-//            File file = new File(filePath);
-//            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-
             for(List<String> list : data){
-                writer.write(list.toString() + "\r\n");
+//                writer.write(list.toString() + "\r\n");
+                writer.write(list.toString().replaceAll(" ", "") + "\r\n");
             }
             writer.flush();
         } catch (Exception e) {
@@ -43,8 +40,6 @@ public class FileUtil {
 
     public static void saveListFileWithoutClose(List<String> data, FileWriter writer){
         try{
-//            File file = new File(filePath);
-//            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
             for(String str : data){
                 writer.write(str + "\r\n");
             }
@@ -161,4 +156,6 @@ public class FileUtil {
 
         saveListFile(allJavaFilePathList, outputPath);
     }
+
+
 }

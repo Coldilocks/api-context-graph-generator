@@ -353,6 +353,7 @@ public class HoleCreator {
                 .map(GraphNode::getVarIdentifier)
                 .map(variableName -> StringUtil.getSplitVariableNameList(variableName, FileUtil.gloveVocabList, FileUtil.stopWordsList))
                 .flatMap(Collection::stream)
+                .distinct() // 去除重复值
                 .collect(Collectors.toList());
 
         return String.join(" ", splitVariableNames);
@@ -364,10 +365,6 @@ public class HoleCreator {
      * @return
      */
     public String getOriginalStatements(GraphNode holeBeginNode) {
-//        if(holeBeginNode.getOriginalStatement() != null && !holeBeginNode.getOriginalStatement().isEmpty())
-//            return holeBeginNode.getOriginalStatement();
-//        else
-//            return "";
         return holeBeginNode.getOriginalStatement();
     }
 

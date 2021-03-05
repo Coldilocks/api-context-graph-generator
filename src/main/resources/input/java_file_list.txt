@@ -1,0 +1,3 @@
+src/main/resources/testcase/Task1.java
+src/main/resources/testcase/Task2.java
+src/main/java/entity/Graph.java

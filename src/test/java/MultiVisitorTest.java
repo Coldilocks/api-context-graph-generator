@@ -110,7 +110,7 @@ public class MultiVisitorTest {
                     /*
                      * 1. Node Names in List
                      */
-                    visitor.nodeNameList.forEach(System.out::println);
+                    // visitor.nodeNameList.forEach(System.out::println);
 
                     /*
                      * 2. Nodes in Depth-First Order

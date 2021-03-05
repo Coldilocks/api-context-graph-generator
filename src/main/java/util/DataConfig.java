@@ -15,9 +15,9 @@ public class DataConfig {
     /** 生成的所有图的路径 */
     public static String GRAPH_OUTPUT_PATH;
     /** glove词表 */
-    public static String GLOVE_VOCAB_PATH = "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/main/resources/vocab/gloveVocab.txt";
+    public static String GLOVE_VOCAB_PATH = "src/main/resources/vocab/gloveVocab.txt";
     /** 常用停用词表 */
-    public static String STOP_WORDS_PATH = "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/main/resources/vocab/stopWords.txt";
+    public static String STOP_WORDS_PATH = "src/main/resources/vocab/stopWords.txt";
     /** 进行预测的python代码路径 */
     public static String GGNN_CLIENT_PYTHON_FILE_PATH;
     /** 分词服务访问路径 */

@@ -18,22 +18,6 @@ import java.util.Map;
  */
 public class GraphvizUtil {
 
-    public static void main(String[] args) throws IOException {
-        createDotFile("/Users/coldilock/Documents/Code/Github/CodeRecPro/src/test/resources/testcase/Task1.java", "/Users/coldilock/Downloads/test.dot");
-    }
-//    public static void createDotFile(String inputPath, String outputPath) throws IOException {
-//        CompilationUnit cu = StaticJavaParser.parse(new File(inputPath));
-//
-//        DotPrinter printer = new DotPrinter(true);
-//        try (FileWriter fileWriter = new FileWriter(outputPath);
-//             PrintWriter printWriter = new PrintWriter(fileWriter)) {
-//                cu.getTypes().forEach(
-//                        type -> type.getMethods().forEach(
-//                                method -> method.getBody().ifPresent(
-//                                        m -> printWriter.print(printer.output(m)))));
-//        }
-//    }
-
     public static void createDotFile(String inputPath, String outputPath) throws IOException {
         CompilationUnit cu = StaticJavaParser.parse(new File(inputPath));
 
@@ -45,13 +29,17 @@ public class GraphvizUtil {
         }
     }
 
+    public static void main(String[] args) throws IOException {
+        createDotFile("/Users/coldilock/Documents/Code/Github/CodeRecPro/src/main/resources/testcase/Task2.java", "/Users/coldilock/Downloads/output.dot");
+    }
+
     /**
      * Create a graph, different edge type has different color
      * @param graphNodeList all the nodes in the graph
      * @param edgeMap all the edges classified by c(control only), d(data only), cd(control and data only)
      * @throws IOException
      */
-    public static void createGraphWithColor(String filePath, List<GraphNode> graphNodeList, Map<String, List<Pair<String, String>>> edgeMap) throws IOException {
+    public static void createPDGWithColor(String filePath, List<GraphNode> graphNodeList, Map<String, List<Pair<String, String>>> edgeMap) throws IOException {
         PrintWriter out = new PrintWriter(filePath);
 
         StringBuilder finalResult = new StringBuilder();
@@ -76,6 +64,19 @@ public class GraphvizUtil {
                     .append("[label=\"")
                     .append("c")
                     .append("\", ")
+                    .append("color=blue")
+                    .append("]\n");
+        }
+
+        StringBuilder eEdgesInResult = new StringBuilder();
+        for(Pair<String, String> edge : edgeMap.get("e")){
+            eEdgesInResult.append("\t")
+                    .append(edge.a)
+                    .append(" -> ")
+                    .append(edge.b)
+                    .append("[label=\"")
+                    .append("e")
+                    .append("\", ")
                     .append("style=bold")
                     .append("]\n");
         }
@@ -94,25 +95,13 @@ public class GraphvizUtil {
                     .append("]\n");
         }
 
-        StringBuilder cdEdgesInResult = new StringBuilder();
-        for(Pair<String, String> edge : edgeMap.get("cd")){
-            cdEdgesInResult.append("\t")
-                    .append(edge.a)
-                    .append(" -> ")
-                    .append(edge.b)
-                    .append("[label=\"")
-                    .append("cd")
-                    .append("\", ")
-                    .append("color=blue")
-                    .append("]\n");
-        }
-
-        finalResult.append(header).append(nodesInResult).append(cEdgesInResult).append(dEdgesInResult).append(cdEdgesInResult).append("}");
+        finalResult.append(header).append(nodesInResult).append(cEdgesInResult).append(eEdgesInResult).append(dEdgesInResult).append("}");
 
         out.print(finalResult);
         out.flush();
         out.close();
     }
+
 
     /**
      * Create a graph

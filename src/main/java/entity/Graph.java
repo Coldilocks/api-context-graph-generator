@@ -52,6 +52,9 @@ public class Graph {
     /** Data flow edge pairs, (source_node_id, target_node_id) */
     private List<Pair<String, String>> dataFlowPairs = new ArrayList<>();
 
+    /** PDG execute flow edge pairs, (source_node_id, target_node_id) */
+    private List<Pair<String, String>> executeFlowPairs = new ArrayList<>();
+
     public GraphNode getRootNode() {
         return rootNode;
     }
@@ -206,6 +209,35 @@ public class Graph {
     }
 
     /**
+     * get pdg exe flow edge
+     * @param root
+     * @return
+     */
+    public List<Pair<String, String>> getPDGExeFlow(GraphNode root){
+        this.executeFlowPairs =  this.breadthFirstTraversal(root).stream()
+                .filter(graphNode -> graphNode.getNextNode() != null)
+                .map(parentNode -> new Pair<>(parentNode.getId(), parentNode.getNextNode().getId()))
+                .collect(Collectors.toList());
+
+        return this.executeFlowPairs;
+    }
+
+    /**
+     * get pdg control flow edge
+     * @param root
+     * @return
+     */
+    public List<Pair<String, String>> getPDGControlFlow(GraphNode root){
+        this.controlFlowPairs =  this.breadthFirstTraversal(root).stream()
+                .flatMap(parentNode -> parentNode.getControlChildNodes().stream()
+                        .map(childNode -> new Pair<>(parentNode.getId(), childNode.getId()))
+                ).collect(Collectors.toList());
+
+        return this.controlFlowPairs;
+    }
+
+
+    /**
      * Get control flow edge, represented by node pair
      * @param root root node of the AST
      * @return all control flow edges, represented by (source node, target node) pair
@@ -216,28 +248,6 @@ public class Graph {
                 .flatMap(parentNode -> parentNode.getChildNodes().stream()
                         .map(childNode -> new Pair<>(parentNode.getId(), childNode.getId()))
                 ).collect(Collectors.toList());
-
-        return this.controlFlowPairs;
-    }
-
-    /**
-     * Get control flow edge, represented by node pair
-     * @param root root node of the AST
-     * @return all control flow edges, represented by (source node, target node) pair
-     */
-    @Deprecated
-    public List<Pair<String, String>> getControlFlow2(GraphNode root){
-        this.controlFlowPairs = new ArrayList<>();
-
-        List<GraphNode> graphNodes = breadthFirstTraversal(root);
-
-        for(GraphNode graphNode : CollectionUtils.emptyIfNull(graphNodes)){
-            for(GraphNode childNode : CollectionUtils.emptyIfNull(graphNode.getChildNodes())){
-                controlFlowPairs.add(new Pair<>(graphNode.getId(), childNode.getId()));
-            }
-        }
-
-        // System.out.println(controlFlowPairs.size());
 
         return this.controlFlowPairs;
     }
@@ -262,6 +272,27 @@ public class Graph {
         result.put("d", this.dataFlowPairs);
         result.put("c", this.controlFlowPairs);
         result.put("cd", controlFlowAndDataFlowPairs);
+
+        return result;
+    }
+
+    public Map<String, List<Pair<String, String>>> getPDGEdges(GraphNode root){
+
+        this.getPDGControlFlow(root);
+        this.getPDGExeFlow(root);
+
+//        List<Pair<String, String>> controlFlowAndDataFlowPairs = new ArrayList<>(this.controlFlowPairs);
+//        controlFlowAndDataFlowPairs.retainAll(this.dataFlowPairs);
+//
+//        this.controlFlowPairs.removeAll(controlFlowAndDataFlowPairs);
+//
+//        this.dataFlowPairs.removeAll(controlFlowAndDataFlowPairs);
+
+        Map<String, List<Pair<String, String>>> result = new HashMap<>();
+        result.put("d", this.dataFlowPairs);
+        result.put("c", this.controlFlowPairs);
+        result.put("e", this.executeFlowPairs);
+//        result.put("cd", controlFlowAndDataFlowPairs);
 
         return result;
     }

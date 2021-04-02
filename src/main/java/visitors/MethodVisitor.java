@@ -112,6 +112,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             conditionNode = graph.linkNodesInControlFlow(conditionNode, conditionChildNodes);
             ifNode.addChildNode(conditionNode);
             conditionNode.setParentNode(ifNode);
+
+            // todo: check
+            ifNode.addControlChildNode(conditionNode);
+            conditionNode.setControlParentNode(ifNode);
         }
 
         graph.addNewScope();
@@ -123,6 +127,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             thenNode = graph.linkNodesInControlFlow(thenNode, thenChildNodes);
             ifNode.addChildNode(thenNode);
             thenNode.setParentNode(ifNode);
+
+            // todo: check
+            ifNode.addControlChildNode(thenNode);
+            thenNode.setControlParentNode(ifNode);
         }
 
         graph.jumpOutOfScope();
@@ -139,6 +147,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             elseNode = graph.linkNodesInControlFlow(elseNode, elseChildNodes);
             ifNode.addChildNode(elseNode);
             elseNode.setParentNode(ifNode);
+
+            // todo: check
+            ifNode.addControlChildNode(elseNode);
+            elseNode.setControlParentNode(ifNode);
         }
 
         graph.jumpOutOfScope();
@@ -170,6 +182,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             conditionNode = graph.linkNodesInControlFlow(conditionNode, conditionChildNodes);
             whileNode.addChildNode(conditionNode);
             conditionNode.setParentNode(whileNode);
+
+            // todo: check
+            whileNode.addControlChildNode(conditionNode);
+            conditionNode.setControlParentNode(whileNode);
         }
 
         // examine the body and get body node
@@ -179,6 +195,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             bodyNode = graph.linkNodesInControlFlow(bodyNode, bodyChildNodes);
             whileNode.addChildNode(bodyNode);
             bodyNode.setParentNode(whileNode);
+
+            // todo: check
+            whileNode.addControlChildNode(bodyNode);
+            bodyNode.setControlParentNode(whileNode);
         }
 
         graph.jumpOutOfScope();
@@ -208,6 +228,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             conditionNode = graph.linkNodesInControlFlow(conditionNode, conditionChildNodes);
             doWhileNode.addChildNode(conditionNode);
             conditionNode.setParentNode(doWhileNode);
+
+            // todo: check
+            doWhileNode.addControlChildNode(conditionNode);
+            conditionNode.setControlParentNode(doWhileNode);
         }
 
         // examine the body and get body node
@@ -218,6 +242,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             bodyNode = graph.linkNodesInControlFlow(bodyNode, bodyChildNodes);
             doWhileNode.addChildNode(bodyNode);
             bodyNode.setParentNode(doWhileNode);
+
+            // todo: check
+            doWhileNode.addControlChildNode(bodyNode);
+            bodyNode.setControlParentNode(doWhileNode);
         }
         graph.jumpOutOfScope();
 
@@ -248,6 +276,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             initializationNode = graph.linkNodesInControlFlow(initializationNode, initializationChildNodes);
             forNode.addChildNode(initializationNode);
             initializationNode.setParentNode(forNode);
+
+            // todo: check
+            forNode.addControlChildNode(initializationNode);
+            initializationNode.setControlParentNode(forNode);
         }
 
         // examine the compare expression and get compare node
@@ -260,6 +292,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             compareNode = graph.linkNodesInControlFlow(compareNode, compareChildNodes);
             forNode.addChildNode(compareNode);
             compareNode.setParentNode(forNode);
+
+            // todo: check
+            forNode.addControlChildNode(compareNode);
+            compareNode.setControlParentNode(forNode);
         }
 
         // examine the body and get body node
@@ -269,6 +305,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             bodyNode = graph.linkNodesInControlFlow(bodyNode, bodyChildNodes);
             forNode.addChildNode(bodyNode);
             bodyNode.setParentNode(forNode);
+
+            // todo: check
+            forNode.addControlChildNode(bodyNode);
+            bodyNode.setControlParentNode(forNode);
         }
 
         // examine the update expression and get update node
@@ -278,6 +318,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             updateNode = graph.linkNodesInControlFlow(updateNode, updateChildNodes);
             forNode.addChildNode(updateNode);
             updateNode.setParentNode(forNode);
+
+            // todo: check
+            forNode.addControlChildNode(updateNode);
+            updateNode.setControlParentNode(forNode);
         }
 
         graph.jumpOutOfScope();
@@ -309,6 +353,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             initializationNode = graph.linkNodesInControlFlow(initializationNode, initializationChildNodes);
             forEachNode.addChildNode(initializationNode);
             initializationNode.setParentNode(forEachNode);
+
+            // todo: check
+            forEachNode.addControlChildNode(initializationNode);
+            initializationNode.setControlParentNode(forEachNode);
         }
 
         // examine the iterable expression and get iterable node
@@ -318,6 +366,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             iterableNode = graph.linkNodesInControlFlow(iterableNode, iterableChildNodes);
             forEachNode.addChildNode(iterableNode);
             iterableNode.setParentNode(forEachNode);
+
+            // todo: check
+            forEachNode.addControlChildNode(iterableNode);
+            iterableNode.setControlParentNode(forEachNode);
         }
 
         // examine the body and get body node
@@ -327,6 +379,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             bodyNode = graph.linkNodesInControlFlow(bodyNode, bodyChildNodes);
             forEachNode.addChildNode(bodyNode);
             bodyNode.setParentNode(forEachNode);
+
+            // todo: check
+            forEachNode.addControlChildNode(bodyNode);
+            bodyNode.setControlParentNode(forEachNode);
         }
 
         graph.jumpOutOfScope();
@@ -366,6 +422,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             selectorNode = graph.linkNodesInControlFlow(selectorNode, selectorChildNodes);
             switchNode.addChildNode(selectorNode);
             selectorNode.setParentNode(switchNode);
+
+            // todo: check
+            switchNode.addControlChildNode(selectorNode);
+            selectorNode.setControlParentNode(switchNode);
         }
 
         graph.jumpOutOfScope();
@@ -385,6 +445,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
                 caseNode = graph.linkNodesInControlFlow(caseNode, caseChildNodes);
                 switchNode.addChildNode(caseNode);
                 caseNode.setParentNode(switchNode);
+
+                // todo: check
+                switchNode.addControlChildNode(caseNode);
+                caseNode.setControlParentNode(switchNode);
             }
         });
 
@@ -430,6 +494,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             selectorNode = graph.linkNodesInControlFlow(selectorNode, selectorChildNodes);
             switchNode.addChildNode(selectorNode);
             selectorNode.setParentNode(switchNode);
+
+            // todo: check
+            switchNode.addControlChildNode(selectorNode);
+            selectorNode.setControlParentNode(switchNode);
         }
 
         graph.jumpOutOfScope();
@@ -444,6 +512,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
                 caseNode = graph.linkNodesInControlFlow(caseNode, caseChildNodes);
                 switchNode.addChildNode(caseNode);
                 caseNode.setParentNode(switchNode);
+
+                // todo: check
+                switchNode.addControlChildNode(caseNode);
+                caseNode.setControlParentNode(switchNode);
             }
         });
 
@@ -481,6 +553,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             tryBodyNode = graph.linkNodesInControlFlow(tryBodyNode, tryBodyChildNodes);
             tryNode.addChildNode(tryBodyNode);
             tryBodyNode.setParentNode(tryNode);
+
+            // todo: check
+            tryNode.addControlChildNode(tryBodyNode);
+            tryBodyNode.setControlParentNode(tryNode);
         }
 
         graph.jumpOutOfScope();
@@ -495,6 +571,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
                 catchClausesNode = graph.linkNodesInControlFlow(catchClausesNode, catchClausesChildNodes);
                 tryNode.addChildNode(catchClausesNode);
                 catchClausesNode.setParentNode(tryNode);
+
+                // todo: check
+                tryNode.addControlChildNode(catchClausesNode);
+                catchClausesNode.setControlParentNode(tryNode);
             }
         });
 
@@ -512,6 +592,10 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             finallyNode = graph.linkNodesInControlFlow(finallyNode, finallyChildNodes);
             tryNode.addChildNode(finallyNode);
             finallyNode.setParentNode(tryNode);
+
+            // todo: check
+            tryNode.addControlChildNode(finallyNode);
+            finallyNode.setControlParentNode(tryNode);
         }
 
         graph.jumpOutOfScope();

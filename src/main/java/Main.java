@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Main {
 
-    private static boolean isCreateGraph = false;
-    private static boolean isCreateDataset = true;
+    private static boolean isCreateGraph = true;
+    private static boolean isCreateDataset = false;
 
     private static boolean checkJdkAPI = true;
     private static boolean checkThirdPartyAPI = true;
@@ -120,11 +120,11 @@ public class Main {
                 // graphNodeList.forEach(graphNode -> System.out.println(graphNode.getNodeName()));
 
                 // 4. Get data and control flow edge, and create a graph
-                Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
+                Map<String, List<Pair<String, String>>> edgeMap = graph.getPDGEdges(rootNode);
 
                 if(isCreateGraph){
                     try {
-                        GraphvizUtil.createGraphWithColor(DataConfig.GRAPH_OUTPUT_PATH + method.getNameAsString() +".dot", graphNodeList, edgeMap);
+                        GraphvizUtil.createPDGWithColor(DataConfig.GRAPH_OUTPUT_PATH + method.getNameAsString() +".dot", graphNodeList, edgeMap);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

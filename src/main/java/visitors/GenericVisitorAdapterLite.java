@@ -1453,5 +1453,27 @@ public abstract class GenericVisitorAdapterLite<R, A> implements GenericVisitor<
 
         return result;
     }
+
+    @Override
+    public List<R> visit(final PatternExpr n, final A arg) {
+        List<R> result = new ArrayList<>();
+        List<R> tmp;
+        {
+            tmp = n.getName().accept(this, arg);
+            if (tmp != null)
+                result.addAll(tmp);
+        }
+        {
+            tmp = n.getType().accept(this, arg);
+            if (tmp != null)
+                result.addAll(tmp);
+        }
+        if (n.getComment().isPresent()) {
+            tmp = n.getComment().get().accept(this, arg);
+            if (tmp != null)
+                result.addAll(tmp);
+        }
+        return result;
+    }
 }
 

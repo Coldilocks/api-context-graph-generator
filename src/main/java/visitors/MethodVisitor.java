@@ -1,5 +1,8 @@
 package visitors;
 
+import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
+import com.github.javaparser.symbolsolver.reflectionmodel.ReflectionMethodDeclaration;
 import entity.Graph;
 import entity.GraphNode;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -794,6 +797,18 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             }
         });
 
+        /*
+         * 将通过new关键字创建的对象名和runtime类型记录到 typeTable 和 newObjInCurrentScope
+         * 如 List<String> list = new ArrayList<>() 中 list的runtime类型是Java.util.ArrayList
+         */
+        n.getInitializer().ifPresent(init -> {
+            if(init.isObjectCreationExpr()){
+                ResolvedConstructorDeclaration resolvedConstructor = init.asObjectCreationExpr().resolve();
+                String qulifiedClassName = resolvedConstructor.getPackageName() + "." + resolvedConstructor.getName();
+                graph.addNewObjInCurrentScope(n.getNameAsString(), qulifiedClassName);
+            }
+        });
+
         return graphNodes;
     }
 
@@ -891,7 +906,46 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
         StringBuilder currentNodeName = new StringBuilder();
         String methodSignature;
         try{
-            methodSignature = n.resolve().getQualifiedSignature();
+            ResolvedMethodDeclaration resolvedMethod = n.resolve();
+            methodSignature = resolvedMethod.getQualifiedSignature();
+
+            // non-static method
+            if(resolvedMethod instanceof ReflectionMethodDeclaration && !resolvedMethod.isStatic()){
+                if(n.getScope().isPresent() && n.getScope().get().isNameExpr()){
+                    // 进行方法调用的变量名
+                    String varName = n.getScope().get().asNameExpr().getNameAsString();
+                    /*
+                     * 方法所属的类的完整类型:
+                     *  由 Java Symbol Solver 对方法名解析得到包名和类名, 然后拼接在一起.
+                     *  如 'list.add(1)' 中 add() 所属的类为 java.util.List
+                     */
+                    String qualifiedClassName = resolvedMethod.getPackageName() + "." + resolvedMethod.getClassName();
+                    /*
+                     * 编译时类型:
+                     *  由 Java Symbol Solver 对变量名解析得到.
+                     *  如 'List<String> list = new ArrayList<>()' 中 list 的类型为java.util.List<java.lang.String>.
+                     */
+                    String compileVarType =  n.getScope().get().asNameExpr().resolve().getType().describe();
+
+                    // 判断是否有必要修改方法签名
+                    if(compileVarType != null && !qualifiedClassName.equals(compileVarType)){
+                        /*
+                         * 运行时类型:
+                         *  只记录对象创建时的类型，由 Java Symbol Solver 对ObjectCreationExpr解析得到.
+                         *  如 'List<String> list = new ArrayList<>()' 中 list 的类型为java.util.ArrayList.
+                         *
+                         *  但没有跟踪后续的类型变化.
+                         *  如没有继续解析 'list = method_return_a_linkedList()' 中 list 的类型.
+                         */
+                        String runTimeVarType = graph.getObjQualifiedTypeInCurrentScope(varName);
+                        if(runTimeVarType != null){
+                            methodSignature = runTimeVarType + "." + resolvedMethod.getSignature();
+                            // System.out.printf("\t[Method]: %s\t->\t[Compile]: %s\t->\t[Runtime]: %s\t[VarName]: %s%n", qualifiedClassName, compileVarType, runTimeVarType, varName);
+                        }
+                    }
+                }
+            }
+
         } catch (UnsolvedSymbolException e){
             methodSignature = "UnsolvedType.UnsolvedSymbolException.In.MethodCallExpr.method()";
         } catch (RuntimeException e){

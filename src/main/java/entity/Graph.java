@@ -46,6 +46,20 @@ public class Graph {
      **/
     private List<List<String>> newVarInCurrentScope = new ArrayList<>();
 
+    /**
+     * 记录每个作用域创建的对象名（通过new来创建的变量），每个list代表一个作用域，最后一个list表示当前作用域
+     * 结构:
+     *      [[obj_name_1_in_scope_1, obj_name_2_in_scope_1, ...], [obj_name_1_in_scope_2, obj_name_2_in_scope_2, ...], ...]
+     **/
+    private List<List<String>> newObjInCurrentScope = new ArrayList<>();
+
+    /**
+     * 记录每个对象名在不同作用域中所属的runtime类型（如 List<String> list = new ArrayList<>() 中 list的runtime类型是Java.util.ArrayList）
+     * 结构:
+     *      key: obj_name_i, value: [qualified_class_name_of_obj_i_in_scope_1, qualified_class_name_of_obj_i_in_scope_2, ...]
+     * **/
+    private Map<String, List<String>> typeTable = new HashMap<>();
+
     /** Control flow edge pairs, (source_node_id, target_node_id) */
     private List<Pair<String, String>> controlFlowPairs = new ArrayList<>();
 
@@ -111,8 +125,11 @@ public class Graph {
      * Create a new list and add it to newVarInCurrentScope when we enter into a new scope.
      */
     public void addNewScope(){
-        List<String> scope = new ArrayList<>();
-        newVarInCurrentScope.add(scope);
+        List<String> varScope = new ArrayList<>();
+        newVarInCurrentScope.add(varScope);
+
+        List<String> objScope = new ArrayList<>();
+        newObjInCurrentScope.add(objScope);
     }
 
     /**
@@ -126,6 +143,16 @@ public class Graph {
     }
 
     /**
+     * 分别向 typeTable 和 newObjInCurrentScope 的当前作用域中添加新的对象名和对象所属的runtime类型
+     * @param objName
+     * @param objQualifiedType
+     */
+    public void addNewObjInCurrentScope(String objName, String objQualifiedType){
+        typeTable.computeIfAbsent(objName, v -> new ArrayList<>()).add(objQualifiedType);
+        newObjInCurrentScope.get(newObjInCurrentScope.size() - 1).add(objName);
+    }
+
+    /**
      * Delete all the variables defined in the current scope when it is over
      */
     public void jumpOutOfScope(){
@@ -134,6 +161,13 @@ public class Graph {
             symbolTable.get(varName).remove(symbolTable.get(varName).size() - 1);
         }
         newVarInCurrentScope.remove(newVarInCurrentScope.size() - 1);
+
+        // 删除 typeTable 和 newObjInCurrentScope 中所有属于当前作用域的对象及类型
+        List<String> objNames = newObjInCurrentScope.get(newObjInCurrentScope.size() - 1);
+        for(String objName : objNames){
+            typeTable.get(objName).remove(typeTable.get(objName).size() - 1);
+        }
+        newObjInCurrentScope.remove(newObjInCurrentScope.size() - 1);
     }
 
     /**
@@ -152,6 +186,19 @@ public class Graph {
                 dataFlowPairs.add(new Pair<>(declaredNodeId, currentNodeId));
             }
         }
+    }
+
+    /**
+     * 获取当前作用域中某个对象中的"运行时"类型
+     * @param objName
+     * @return
+     */
+    public String getObjQualifiedTypeInCurrentScope(String objName){
+        List<String> qualifiedTypesWithSameObjName = typeTable.get(objName);
+        if(qualifiedTypesWithSameObjName != null){
+            return qualifiedTypesWithSameObjName.get(qualifiedTypesWithSameObjName.size() - 1);
+        }
+        return null;
     }
 
     public List<Pair<String, String>> getDataFlowPairs(){

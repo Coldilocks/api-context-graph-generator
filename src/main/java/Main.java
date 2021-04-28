@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Main {
 
-    private static boolean isCreateGraph = false;
-    private static boolean isCreateDataset = true;
+    private static boolean isCreateGraph = true;
+    private static boolean isCreateDataset = false;
 
     private static boolean checkJdkAPI = true;
     private static boolean checkThirdPartyAPI = true;

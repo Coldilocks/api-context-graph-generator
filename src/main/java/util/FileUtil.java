@@ -140,21 +140,42 @@ public class FileUtil {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-
-        String projectsDirectory = "/Users/coldilock/Downloads/JavaCodeCorpus/methoc call dataset/big projects";
-        String outputPath = "/Users/coldilock/Downloads/file_list.txt";
-
-        List<String> allJavaFilePathList = new ArrayList<>();
-
-        List<String> projectRootPathList = getProjectRootPathList(projectsDirectory);
-        for(String projectRootPath : projectRootPathList){
-            List<String> javaFileList = new ArrayList<>();
-            getAllJavaFileList(new File(projectRootPath), javaFileList);
-            allJavaFilePathList.addAll(javaFileList);
+    /**
+     * 获取一个文件夹中所有的jar文件
+     * @param file 根目录
+     * @param files 存储jar文件路径的list
+     */
+    public static void getAllJarFileList(File file, List<String> files) {
+        if(file.isDirectory() && file.listFiles() != null){
+            File[] fs = file.listFiles();
+            for (File f : fs){
+                getAllJarFileList(f, files);
+            }
+        } else if(file.isFile() && file.getPath().endsWith(".jar")){
+            files.add(file.getPath());
         }
+    }
 
+    /**
+     * 获取数据集中所有Java文件的路径
+     * @param projectsDirectory 原始数据集的根目录
+     * @param outputPath 存储java文件路径列表的txt文件路径
+     */
+    public static void getAllJavaFileList(String projectsDirectory, String outputPath) {
+        List<String> allJavaFilePathList = new ArrayList<>();
+        getAllJavaFileList(new File(projectsDirectory), allJavaFilePathList);
         saveListFile(allJavaFilePathList, outputPath);
+    }
+
+    public static void getAllJarFileList(String jarFileFolder, String outputPath) {
+        List<String> allJarFilePathList = new ArrayList<>();
+        getAllJarFileList(new File(jarFileFolder), allJarFilePathList);
+        saveListFile(allJarFilePathList, outputPath);
+    }
+
+    public static void main(String[] args) {
+        getAllJarFileList("/Users/coldilock/Documents/Code/Github/CodeRecPro/src/main/resources/input/jarfiles",
+                "/Users/coldilock/Documents/Code/Github/CodeRecPro/src/main/resources/input/jar_file_list.txt");
     }
 
 

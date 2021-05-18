@@ -596,12 +596,6 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
         return graphNodes;
     }
 
-    /**
-     * todo: examine SynchronizedStmt
-     * @param n
-     * @param nodeId
-     * @return
-     */
     @Override
     public List<GraphNode> visit(SynchronizedStmt n, String nodeId) {
         super.visit(n, nodeId);
@@ -803,9 +797,18 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
          */
         n.getInitializer().ifPresent(init -> {
             if(init.isObjectCreationExpr()){
-                ResolvedConstructorDeclaration resolvedConstructor = init.asObjectCreationExpr().resolve();
-                String qulifiedClassName = resolvedConstructor.getPackageName() + "." + resolvedConstructor.getName();
-                graph.addNewObjInCurrentScope(n.getNameAsString(), qulifiedClassName);
+                String qualifiedClassName;
+                try{
+                    ResolvedConstructorDeclaration resolvedConstructor = init.asObjectCreationExpr().resolve();
+                    qualifiedClassName = resolvedConstructor.getPackageName() + "." + resolvedConstructor.getName();
+                } catch (UnsolvedSymbolException e){
+                    qualifiedClassName = "UnsolvedType.UnsolvedSymbolException.In.VariableDeclarator.ObjType";
+                } catch (RuntimeException e){
+                    qualifiedClassName = "UnsolvedType.RuntimeException.In.VariableDeclarator.ObjType";
+                } catch (Exception e){
+                    qualifiedClassName = "UnsolvedType.In.VariableDeclarator.ObjType()";
+                }
+                graph.addNewObjInCurrentScope(n.getNameAsString(), qualifiedClassName);
             }
         });
 

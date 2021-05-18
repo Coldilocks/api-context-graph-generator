@@ -1,0 +1,2 @@
+src/main/resources/input/jarfiles/commons-collections4-4.4.jar
+src/main/resources/input/jarfiles/javaparser-core-3.16.1.jar

@@ -17,10 +17,10 @@ import visitors.MethodVisitor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author coldilock
@@ -28,11 +28,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Main {
 
     private static boolean isCreateGraph = true;
-    private static boolean isCreateDataset = false;
+    private static boolean isCreateDataset = true;
 
     private static boolean checkJdkAPI = true;
     private static boolean checkThirdPartyAPI = true;
-    private static boolean checkUserDefinedAPI = true;
+    private static boolean checkUserDefinedAPI = false;
 
     public static void main(String[] args) throws Exception {
 
@@ -43,7 +43,10 @@ public class Main {
         } else {
             DataConfig.loadConfig(args[0]);
 
+            FileUtil.getAllJavaFileList(DataConfig.DATASET_ROOT, DataConfig.JAVA_FILE_PATH);
+            FileUtil.getAllJarFileList(DataConfig.JAR_FILE_ROOT, DataConfig.JAR_FILE_PATH);
             FileUtil.initVocab();
+
             DataCollector.createWriters();
             createDataset(DataConfig.JAVA_FILE_PATH);
             DataCollector.closeWriters();
@@ -68,13 +71,8 @@ public class Main {
         }
         // solve qualified name from third party api
         if(checkThirdPartyAPI){
-            // add the jar file path
-            String firstJarFile = "src/main/resources/input/jarfiles/javaparser-core-3.16.1.jar";
-            String secondJarFile = "src/main/resources/input/jarfiles/commons-collections4-4.4.jar";
-
-            List<String> jarFileList = new ArrayList<>();
-            jarFileList.add(firstJarFile);
-            jarFileList.add(secondJarFile);
+            // get the jar file list
+            List<String> jarFileList = FileUtil.readFile2List(DataConfig.JAR_FILE_PATH);
 
             for(String jarFilePath : jarFileList){
                 typeSolver.add(JarTypeSolver.getJarTypeSolver(jarFilePath));
@@ -113,14 +111,16 @@ public class Main {
                 // 1. Get root node
                 GraphNode rootNode = graphNodes.get(0);
 
-                // 2. Get nodes in depth-first order
+                // 2. Get nodes and id in depth-first order
                 List<GraphNode> graphNodeList = graph.getGraphNodesDFS(rootNode);
+
+                List<String> graphNodeIdList = graphNodeList.stream().map(GraphNode::getId).collect(Collectors.toList());
 
                 // 3. Print all node names
                 // graphNodeList.forEach(graphNode -> System.out.println(graphNode.getNodeName()));
 
                 // 4. Get data and control flow edge, and create a graph
-                Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
+                Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode, graphNodeIdList);
 
                 if(isCreateGraph){
                     try {

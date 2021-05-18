@@ -294,7 +294,7 @@ public class Graph {
      * @param root root node of the AST
      * @return a map containing c, d, cd edges
      */
-    public Map<String, List<Pair<String, String>>> getControlAndDataFlowPairs(GraphNode root){
+    public Map<String, List<Pair<String, String>>> getControlAndDataFlowPairs(GraphNode root, List<String> graphNodeIdList){
 
         this.getControlFlow(root);
 
@@ -304,6 +304,9 @@ public class Graph {
         this.controlFlowPairs.removeAll(controlFlowAndDataFlowPairs);
 
         this.dataFlowPairs.removeAll(controlFlowAndDataFlowPairs);
+
+        // 删除不存在的数据流边（这种情况出现在：变量被定义的结点存在，但是使用变量的结点因为无法解析等原因而不存在）
+        this.dataFlowPairs.removeIf(pair -> !graphNodeIdList.contains(pair.a) || !graphNodeIdList.contains(pair.b));
 
         Map<String, List<Pair<String, String>>> result = new HashMap<>();
         result.put("d", this.dataFlowPairs);

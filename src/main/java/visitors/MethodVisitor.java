@@ -478,7 +478,7 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
 //        }
 //        GraphNode tryBodyNode = new GraphNode("Body", StringUtil.getUuid());
         List<GraphNode> tryBodyChildNodes = n.getTryBlock().accept(this, nodeId);
-        if(tryBodyChildNodes != null){
+        if(tryBodyChildNodes != null && tryBodyChildNodes.size() > 0){
             GraphNode tryBodyNode = tryBodyChildNodes.get(0);
             tryBodyChildNodes.remove(0);
             tryBodyNode = graph.linkNodesInControlFlow(tryBodyNode, tryBodyChildNodes);
@@ -736,21 +736,40 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
 
         StringBuilder currentNodeName = new StringBuilder();
         // Get the qualified type name of this variable
-        String typeName;
+        String instanceTypeName;
         try{
-            typeName = n.resolve().getType().describe();
+            instanceTypeName = n.resolve().getType().describe();
         } catch (UnsolvedSymbolException e){
-            typeName = "UnsolvedType.UnsolvedSymbolException.In.VariableDeclarator.varType";
+            instanceTypeName = "UnsolvedType.UnsolvedSymbolException.In.VariableDeclarator.varType";
         } catch (RuntimeException e){
-            typeName = "UnsolvedType.RuntimeException.In.VariableDeclarator.varType";
+            instanceTypeName = "UnsolvedType.RuntimeException.In.VariableDeclarator.varType";
         } catch (Exception e){
-            typeName = "UnsolvedType.In.VariableDeclarator.varType";
+            instanceTypeName = "UnsolvedType.In.VariableDeclarator.varType";
         }
-        currentNodeName.append(typeName);
 
-        // unsolved type variable will not be recorded
-        if(!checkNodeName(typeName))
+        String referenceTypeName;
+        try{
+            referenceTypeName = n.getType().resolve().describe();
+        } catch (UnsolvedSymbolException e){
+            referenceTypeName = "UnsolvedType.UnsolvedSymbolException.In.VariableDeclarator.varType";
+        } catch (RuntimeException e){
+            referenceTypeName = "UnsolvedType.RuntimeException.In.VariableDeclarator.varType";
+        } catch (Exception e){
+            referenceTypeName = "UnsolvedType.In.VariableDeclarator.varType";
+        }
+
+        /*
+         * Consider the instance type of the variable first, and then the reference type if the instance type can't be resolved
+         * For example: List<String> list = new ArrayList<>()
+         */
+        if(checkNodeName(instanceTypeName)) {
+            currentNodeName.append(instanceTypeName);
+        } else if (checkNodeName(referenceTypeName)) {
+            currentNodeName.append(referenceTypeName);
+        } else {
+            // unsolved type variable will not be recorded
             return graphNodes;
+        }
 
         /*
          * CREATE node for initializer-ABSENT VariableDeclarator
@@ -771,23 +790,30 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
          */
         n.getInitializer().ifPresent(init -> {
             if(init.isLiteralExpr() && !init.isNullLiteralExpr() && !init.isTextBlockLiteralExpr()){
-                currentNodeName.append(".").append("Constant");
+                currentNodeName.append(".").append("Declaration").append(".").append("Constant");
                 graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), currentNodeId));
                 graph.addNewVarInCurrentScope(n.getNameAsString(), currentNodeId);
             } else if(init.isNullLiteralExpr()){
                 currentNodeName.append(".").append("Declaration").append(".").append("Null");
                 graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), currentNodeId));
                 graph.addNewVarInCurrentScope(n.getNameAsString(), currentNodeId);
-            } else if((init.isMethodCallExpr() || init.isObjectCreationExpr()) && childNodes.size() > 0){
-                /*
-                 * Record variable name to SYMBOLTABLE.
-                 *
-                 * when the initializer is a METHODCALL / OBJECTCREATION Expr,
-                 * the corresponding node has already been created and added into the childNodes list (the LAST node).
-                 * So get the node id and add the (varName, nodeId) pair to SYMBOLTABLE (used for data dependency phase)
-                 */
-                String lastNodeId = childNodes.get(childNodes.size() - 1).getId();
-                graph.addNewVarInCurrentScope(n.getNameAsString(), lastNodeId);
+            } else if(init.isMethodCallExpr() || init.isObjectCreationExpr()){
+                if(childNodes.size() > 0){
+                    /*
+                     * Record variable name to SYMBOLTABLE.
+                     *
+                     * when the initializer is a METHODCALL / OBJECTCREATION Expr,
+                     * the corresponding node has already been created and added into the childNodes list (the LAST node).
+                     * So get the node id and add the (varName, nodeId) pair to SYMBOLTABLE (used for data dependency phase)
+                     */
+                    String lastNodeId = childNodes.get(childNodes.size() - 1).getId();
+                    graph.addNewVarInCurrentScope(n.getNameAsString(), lastNodeId);
+                }
+            } else {
+                // For example：FieldAccessExpr
+                currentNodeName.append(".").append("Declaration").append("Constant");
+                graphNodes.add(new GraphNode(currentNodeName.toString(), n.getNameAsString(), "VarDec", n.toString(), currentNodeId));
+                graph.addNewVarInCurrentScope(n.getNameAsString(), currentNodeId);
             }
         });
 
@@ -847,6 +873,9 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
             objCreationName = "UnsolvedType.In.ObjectCreationExpr.new()";
         }
         currentNodeName.append(objCreationName);
+
+        if(!checkNodeName(currentNodeName.toString()))
+            return graphNodes;
 
         if(n.getParentNode().isPresent()){
 
@@ -992,16 +1021,43 @@ public class MethodVisitor extends GenericVisitorAdapterLite<GraphNode, String> 
          *      e.g. 'String str1;\n    str1 = str1.replace(sb.toString, str2));'
          *      the data flow of str1: 'java.lang.String.Declaration' -> 'java.lang.String.replace(java.lang.String, java.lang.String)'
          */
-        List<GraphNode> assignValueNodes = n.getValue().accept(this, nodeId);
-        String lastNodeId = "";
-        if(assignValueNodes != null && assignValueNodes.size() > 0){
-            lastNodeId = assignValueNodes.get(assignValueNodes.size() - 1).getId();
-            graphNodes.addAll(assignValueNodes);
+        if(!n.getTarget().isNameExpr())
+            return graphNodes;
+
+        String targetType;
+        try {
+            targetType = n.getTarget().asNameExpr().resolve().getType().describe();
+        } catch (Exception e){
+            targetType = "UnsolvedType.In.VariableDeclarator.varType";
         }
 
-        List<GraphNode> childNodes_ = n.getTarget().accept(this, lastNodeId);
-        if(childNodes_ != null){
-            graphNodes.addAll(childNodes_);
+        if(!checkNodeName(targetType))
+            return graphNodes;
+
+        StringBuilder currentNodeName = new StringBuilder(targetType);
+        String currentNodeId = StringUtil.getUuid();
+
+        if(n.getValue().isNullLiteralExpr()) {
+            currentNodeName.append(".").append("Null");
+            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getTarget().asNameExpr().getNameAsString(), "VarAssign", n.toString(), currentNodeId));
+            graph.linkDataFlow(currentNodeId, n.getTarget().asNameExpr().getNameAsString());
+        } else if(n.getValue().isMethodCallExpr() || n.getValue().isFieldAccessExpr() || n.getValue().isObjectCreationExpr()) {
+
+            List<GraphNode> assignValueNodes = n.getValue().accept(this, nodeId);
+            String lastNodeId = "";
+            if(assignValueNodes != null && assignValueNodes.size() > 0){
+                lastNodeId = assignValueNodes.get(assignValueNodes.size() - 1).getId();
+                graphNodes.addAll(assignValueNodes);
+            }
+
+            List<GraphNode> childNodes_ = n.getTarget().accept(this, lastNodeId);
+            if(childNodes_ != null){
+                graphNodes.addAll(childNodes_);
+            }
+        } else {
+            currentNodeName.append(".").append("Constant");
+            graphNodes.add(new GraphNode(currentNodeName.toString(), n.getTarget().asNameExpr().getNameAsString(), "VarAssign", n.toString(), currentNodeId));
+            graph.linkDataFlow(currentNodeId, n.getTarget().asNameExpr().getNameAsString());
         }
 
         return graphNodes;

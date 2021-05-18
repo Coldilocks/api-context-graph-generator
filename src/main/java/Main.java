@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author coldilock
@@ -30,7 +31,7 @@ public class Main {
     private static boolean isCreateDataset = true;
 
     private static boolean checkJdkAPI = true;
-    private static boolean checkThirdPartyAPI = false;
+    private static boolean checkThirdPartyAPI = true;
     private static boolean checkUserDefinedAPI = false;
 
     public static void main(String[] args) throws Exception {
@@ -110,14 +111,16 @@ public class Main {
                 // 1. Get root node
                 GraphNode rootNode = graphNodes.get(0);
 
-                // 2. Get nodes in depth-first order
+                // 2. Get nodes and id in depth-first order
                 List<GraphNode> graphNodeList = graph.getGraphNodesDFS(rootNode);
+
+                List<String> graphNodeIdList = graphNodeList.stream().map(GraphNode::getId).collect(Collectors.toList());
 
                 // 3. Print all node names
                 // graphNodeList.forEach(graphNode -> System.out.println(graphNode.getNodeName()));
 
                 // 4. Get data and control flow edge, and create a graph
-                Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode);
+                Map<String, List<Pair<String, String>>> edgeMap = graph.getControlAndDataFlowPairs(rootNode, graphNodeIdList);
 
                 if(isCreateGraph){
                     try {

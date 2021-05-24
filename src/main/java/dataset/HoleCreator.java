@@ -190,16 +190,15 @@ public class HoleCreator {
         /*
          * 3.2.2 删除控制流 c边 集合中，所有和窟窿中节点有关联的边
          * 对于c边集合中的每一个Pair(a,b)
-         * 如果 holeNodesId.contains(a) && holeNodesId.contains(b)：删除这个Pair
+         * 如果 holeNodesId.contains(a) || holeNodesId.contains(b)：删除这个Pair
          * 或者 childNodesIdOfHoleNodes.contains(a) || childNodesIdOfHoleNodes.contains(b)：删除这个Pair
          * 或者 (beginNodeParentId, holeBeginNode)、(holeEndNode, NextNodeOfEndNode)在c边集合中，删除这个Pair
          */
         Pair<String, String> finalBeginEdge = beginEdge;
         Pair<String, String> finalEndEdge = endEdge;
-
         // 过滤控制流边中，和窟窿中节点相关的边
         List<Pair<String, String>> controlFlowPairs = this.edgeMap.get("c").stream()
-                .filter(edge -> (!holeNodesId.contains(edge.a) || !holeNodesId.contains(edge.b))
+                .filter(edge -> (!holeNodesId.contains(edge.a) && !holeNodesId.contains(edge.b))
                         && !childNodesIdOfHoleNodes.contains(edge.a)
                         && !childNodesIdOfHoleNodes.contains(edge.b)
                         && !edge.equals(finalBeginEdge)
@@ -210,12 +209,12 @@ public class HoleCreator {
         /*
          * 3.2.3 删除控制数据流 cd边 集合中，所有和窟窿中节点有关联的边
          * 对于cd边集合中的每一个Pair(a,b)
-         * 如果 holeNodesId.contains(a) && holeNodesId.contains(b)：删除这个Pair
+         * 如果 holeNodesId.contains(a) || holeNodesId.contains(b)：删除这个Pair
          * 或者 childNodesIdOfHoleNodes.contains(a) || childNodesIdOfHoleNodes.contains(b)：删除这个Pair
          * 或者 (beginNodeParentId, holeBeginNode)、(holeEndNode, NextNodeOfEndNode)在c边集合中，删除这个Pair
          */
         List<Pair<String, String>> controlFlowAndDataFlowPairs = this.edgeMap.get("cd").stream()
-                .filter(edge -> (!holeNodesId.contains(edge.a) || !holeNodesId.contains(edge.b))
+                .filter(edge -> (!holeNodesId.contains(edge.a) && !holeNodesId.contains(edge.b))
                         && !childNodesIdOfHoleNodes.contains(edge.a)
                         && !childNodesIdOfHoleNodes.contains(edge.b)
                         && !edge.equals(finalBeginEdge)

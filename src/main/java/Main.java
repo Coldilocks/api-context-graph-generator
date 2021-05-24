@@ -26,8 +26,7 @@ import java.util.stream.Collectors;
  * @author coldilock
  */
 public class Main {
-
-    private static boolean isCreateGraph = true;
+    private static boolean isCreateGraph = false;
     private static boolean isCreateDataset = true;
 
     private static boolean checkJdkAPI = true;

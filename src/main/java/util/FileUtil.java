@@ -26,10 +26,23 @@ public class FileUtil {
         }
     }
 
+    public static void save2dList2JsonFileWithoutClose(List<List<String>> data, FileWriter writer){
+        try{
+            for(List<String> list : data){
+                String rawResult = list.toString().replaceAll(" ", "");
+                String finalResult = "{" + rawResult.substring(1, rawResult.length() - 1) + "}\r\n";
+                writer.write(finalResult);
+            }
+            writer.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static void save2dListFileWithoutClose(List<List<String>> data, FileWriter writer){
         try{
             for(List<String> list : data){
-//                writer.write(list.toString() + "\r\n");
                 writer.write(list.toString().replaceAll(" ", "") + "\r\n");
             }
             writer.flush();
@@ -37,6 +50,7 @@ public class FileUtil {
             e.printStackTrace();
         }
     }
+
 
     public static void saveListFileWithoutClose(List<String> data, FileWriter writer){
         try{

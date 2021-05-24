@@ -52,7 +52,7 @@ public class DataCollector {
 
     public static void saveCurrentData(){
         // 存储由当前方法构造的数据
-        FileUtil.save2dListFileWithoutClose(graphVocabList, graphVocabWriter);
+        FileUtil.save2dList2JsonFileWithoutClose(graphVocabList, graphVocabWriter);
         FileUtil.save2dListFileWithoutClose(graphReprensentList, graphReprensentWriter);
         FileUtil.saveListFileWithoutClose(traceList, traceWriter);
         FileUtil.saveListFileWithoutClose(singlePredictionList, singlePredictionWriter);
